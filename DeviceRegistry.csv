@@ -1,0 +1,60 @@
+id,type,typeLabel,manufacturer,label,footnotes,partNumber,checkboxId
+PwrE_DynamicArm,PwrE,Powered Elbow,Ottobock,DynamicArm,,(12K100N),Checkbox_PwrE_DynamicArm
+PwrE_DynamicArmPlus,PwrE,Powered Elbow,Ottobock,DynamicArm Plus,,(12K110N),Checkbox_PwrE_DynamicArmPlus
+PwrE_EspirePro,PwrE,Powered Elbow,Steeper,Espire Pro,,,Checkbox_PwrE_EspirePro
+PwrE_Lukearm,PwrE,Powered Elbow,Mobius,Luke Arm,,,Checkbox_PwrE_Lukearm
+PwrE_MotionE2Elbow,PwrE,Powered Elbow,Fillauer,Motion E2 Elbow,,(5010[094-101]),Checkbox_PwrE_MotionE2Elbow
+PwrE_NoElbow,PwrE,Powered Elbow,,No Elbow,,,Checkbox_PwrE_NoElbow
+PwrE_UtahArm3,PwrE,Powered Elbow,Fillauer,Utah Arm 3+,2,(50100[39-41]),Checkbox_PwrE_UtahArm3
+HybE_AxonArmErgo,HybE,Hybrid Elbow,Ottobock,AxonArm Ergo,1,(12K501),Checkbox_HybE_AxonArmErgo
+HybE_ErgoArmElectronicplus,HybE,Hybrid Elbow,Ottobock,ErgoArm Electronic Plus,1,(12K50),Checkbox_HybE_ErgoArmElectronicplus
+HybE_ErgoArmHybridplus,HybE,Hybrid Elbow,Ottobock,ErgoArm Hybrid Plus,,(12K44),Checkbox_HybE_ErgoArmHybridplus
+HybE_EspireHybrid,HybE,Hybrid Elbow,Steeper,Espire Hybrid,1,,Checkbox_HybE_EspireHybrid
+HybE_Espire_Classic_Plus,HybE,Hybrid Elbow,Steeper,Espire Classic Plus,7,,Checkbox_HybE_Espire_Classic_Plus
+HybE_MotionArmEL,HybE,Hybrid Elbow,Fillauer,Motion Arm EL,,(50101[42-44]),Checkbox_HybE_MotionArmEL
+HybE_MotionArmML,HybE,Hybrid Elbow,Fillauer,Motion Arm ML,,(50101[39-41]),Checkbox_HybE_MotionArmML
+HybE_UtahHybridArm,HybE,Hybrid Elbow,Fillauer,"Utah Hybrid Arm1,",,(50100[42-44]),Checkbox_HybE_UtahHybridArm
+RotW_AxonRotation,RotW,Wrist Rotation,Ottobock,AxonRotation,,(95503),Checkbox_RotW_AxonRotation
+RotW_ElectronicWristRotator,RotW,Wrist Rotation,Ottobock,Electric Wrist Rotator,,(10S17),Checkbox_RotW_ElectronicWristRotator
+RotW_ElectronicWristRotator_MyoRotronic,RotW,Wrist Rotation,Ottobock,Electric Wrist Rotator & MyoRotronic,,(10S17 & 13E205),Checkbox_RotW_ElectronicWristRotator_MyoRotronic
+RotW_Lukearm,RotW,Wrist Rotation,Mobius,Luke Arm,,,Checkbox_RotW_Lukearm
+RotW_NoWrist,RotW,Wrist Rotation,,No Powered Wrist,,,Checkbox_RotW_NoWrist
+RotW_ProWristRotator,RotW,Wrist Rotation,Fillauer,ProWrist Rotator,,(5010056),Checkbox_RotW_ProWristRotator
+RotW_ProWristRotator_ConfigUpgrade4,RotW,Wrist Rotation,Fillauer,"ProWrist Rotator & 4-Band Coaxial Plug, Simultaneous",,(5010056 & 3010871),Checkbox_RotW_ProWristRotator_ConfigUpgrade4
+RotW_ProWristRotator_ConfigUpgrade6,RotW,Wrist Rotation,Fillauer,"ProWrist Rotator & 6-Band Coaxial Plug, Sequential",,(5010056 & 3010832),Checkbox_RotW_ProWristRotator_ConfigUpgrade6
+RotW_StandardWristRotator,RotW,Wrist Rotation,Fillauer,Standard Wrist Rotator,,(5010045),Checkbox_RotW_StandardWristRotator
+RotW_StandardWristRotator_6BandCoaxialPlug,RotW,Wrist Rotation,Fillauer,Standard Wrist Rotator & 6-Band Coaxial Plug,3,(5010045 & 3010869),Checkbox_RotW_StandardWristRotator_6BandCoaxialPlug
+FlxW_Lukearm,FlxW,Wrist Flexion,Mobius,Luke Arm,,,Checkbox_FlxW_Lukearm
+FlxW_PoweredFlexionWrist,FlxW,Wrist Flexion,Fillauer,Powered Flexion Wrist,,(301099[3-8]),Checkbox_FlxW_PoweredFlexionWrist
+OCHand_AbilityHand,OCHand,Open/Close Hand,Psyonic,Ability Hand,,,Checkbox_OCHand_AbilityHand
+OCHand_Adams_Hand,OCHand,Open/Close Hand,BionIT,Adam's Hand,,,Checkbox_OCHand_Adams_Hand
+OCHand_AetherZeus,OCHand,Open/Close Hand,Aether,Zeus,,,Checkbox_OCHand_AetherZeus
+OCHand_AxonHook,OCHand,Open/Close Hand,Ottobock,AxonHook,,(8E5600),Checkbox_OCHand_AxonHook
+OCHand_CovviHand,OCHand,Open/Close Hand,COVVI,COVVI Hand,,,Checkbox_OCHand_CovviHand
+OCHand_Esper_Hand,OCHand,Open/Close Hand,Esper,Esper Hand,,,Checkbox_OCHand_Esper_Hand
+OCHand_Genesis_Hand,OCHand,Open/Close Hand,Alt-Bionics,Genesis Hand,,,Checkbox_OCHand_Genesis_Hand
+OCHand_Lukearm,OCHand,Open/Close Hand,Mobius,Luke Arm,,(includes Grip Select +/-),Checkbox_OCHand_Lukearm
+OCHand_MichelangeloHand,OCHand,Open/Close Hand,Ottobock,Michelangelo Hand,,(8E500),Checkbox_OCHand_MichelangeloHand
+OCHand_MyoHandVariPlusSpeed,OCHand,Open/Close Hand,Ottobock,MyoHand VariPlus Speed,,(8E38=9),Checkbox_OCHand_MyoHandVariPlusSpeed
+OCHand_Myo_Kinisi,OCHand,Open/Close Hand,Steeper,Myo Kinisi,,,Checkbox_OCHand_Myo_Kinisi
+OCHand_ProPlusETD_ETD2,OCHand,Open/Close Hand,Fillauer,ProPlus ETD/ETD,,,Checkbox_OCHand_ProPlusETD_ETD2
+OCHand_ProPlusHand,OCHand,Open/Close Hand,Fillauer,ProPlus Hand,,,Checkbox_OCHand_ProPlusHand
+OCHand_SensorHandSpeed,OCHand,Open/Close Hand,Ottobock,SensorHand Speed,,(8E38=8),Checkbox_OCHand_SensorHandSpeed
+OCHand_SystemElectricGreifer,OCHand,Open/Close Hand,Ottobock,System Electric Greifer,,(8E33/4=7/9),Checkbox_OCHand_SystemElectricGreifer
+OCHand_SystemElectricHand,OCHand,Open/Close Hand,Ottobock,System Electric Hand,,(8E38=7),Checkbox_OCHand_SystemElectricHand
+OCHand_TASKA,OCHand,Open/Close Hand,TASKA,TASKA (any),,,Checkbox_OCHand_TASKA
+OCHand_VincentEvolution3,OCHand,Open/Close Hand,Vincent,VincentEvolution3/3+/4,,,Checkbox_OCHand_VincentEvolution3
+OCHand_bebionic,OCHand,Open/Close Hand,Ottobock,bebionic,,(any),Checkbox_OCHand_bebionic
+OCHand_iLimbHands,OCHand,Open/Close Hand,Ossur,i-Limb Hands,,,Checkbox_OCHand_iLimbHands
+MFHand_AbilityHand,MFHand,Multi-Function Hand,Psyonic,Ability Hand,,,Checkbox_MFHand_AbilityHand
+MFHand_AetherZeus,MFHand,Multi-Function Hand,Aether,Zeus,,,Checkbox_MFHand_AetherZeus
+MFHand_CovviHand,MFHand,Multi-Function Hand,COVVI,COVVI Hand,9,,Checkbox_MFHand_CovviHand
+MFHand_Esper_Hand,MFHand,Multi-Function Hand,Esper,Esper Hand,,,Checkbox_MFHand_Esper_Hand
+MFHand_MIA_Hand,MFHand,Multi-Function Hand,Prensilia,MIA Hand,,,Checkbox_MFHand_MIA_Hand
+MFHand_MichelangeloHand,MFHand,Multi-Function Hand,Ottobock,Michelangelo Hand,,(8E500),Checkbox_MFHand_MichelangeloHand
+MFHand_TASKA,MFHand,Multi-Function Hand,TASKA,TASKA,,,Checkbox_MFHand_TASKA
+MFHand_TASKA_CX,MFHand,Multi-Function Hand,TASKA,TASKA CX,6,,Checkbox_MFHand_TASKA_CX
+MFHand_VincentEvolution3,MFHand,Multi-Function Hand,Vincent,VincentEvolution3/4,8,,Checkbox_MFHand_VincentEvolution3
+MFHand_bebionicBB1000,MFHand,Multi-Function Hand,Ottobock,bebionic 4-band,,(8E7x),Checkbox_MFHand_bebionicBB1000
+MFHand_bebionicBBHxxxQD,MFHand,Multi-Function Hand,Ottobock,bebionic 6-band,4,(BBHxxxQD),Checkbox_MFHand_bebionicBBHxxxQD
+MFHand_iLimbQuantum,MFHand,Multi-Function Hand,Ossur,i-Limb Quantum,5,,Checkbox_MFHand_iLimbQuantum
