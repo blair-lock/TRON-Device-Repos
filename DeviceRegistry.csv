@@ -34,7 +34,6 @@ OCHand_CovviHand,OCHand,Open/Close Hand,COVVI,COVVI Hand,,,Checkbox_OCHand_Covvi
 OCHand_Esper_Hand,OCHand,Open/Close Hand,Esper,Esper Hand,,,Checkbox_OCHand_Esper_Hand
 OCHand_Genesis_Hand,OCHand,Open/Close Hand,Alt-Bionics,Genesis Hand,,,Checkbox_OCHand_Genesis_Hand
 OCHand_Lukearm,OCHand,Open/Close Hand,Mobius,Luke Arm,,(includes Grip Select +/-),Checkbox_OCHand_Lukearm
-OCHand_MichelangeloHand,OCHand,Open/Close Hand,Ottobock,Michelangelo Hand,,(8E500),Checkbox_OCHand_MichelangeloHand
 OCHand_MyoHandVariPlusSpeed,OCHand,Open/Close Hand,Ottobock,MyoHand VariPlus Speed,,(8E38=9),Checkbox_OCHand_MyoHandVariPlusSpeed
 OCHand_Myo_Kinisi,OCHand,Open/Close Hand,Steeper,Myo Kinisi,,,Checkbox_OCHand_Myo_Kinisi
 OCHand_ProPlusETD_ETD2,OCHand,Open/Close Hand,Fillauer,ProPlus ETD/ETD,,,Checkbox_OCHand_ProPlusETD_ETD2
