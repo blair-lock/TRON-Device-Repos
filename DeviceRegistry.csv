@@ -4,7 +4,7 @@ PwrE_DynamicArmPlus,PwrE,Powered Elbow,Ottobock,DynamicArm Plus,,(12K110N),Check
 PwrE_EspirePro,PwrE,Powered Elbow,Steeper,Espire Pro,,,Checkbox_PwrE_EspirePro
 PwrE_Lukearm,PwrE,Powered Elbow,Mobius,Luke Arm,,,Checkbox_PwrE_Lukearm
 PwrE_MotionE2Elbow,PwrE,Powered Elbow,Fillauer,Motion E2 Elbow,,(5010[094-101]),Checkbox_PwrE_MotionE2Elbow
-No_Elbow,PwrE,Powered Elbow,,No Elbow,,,Checkbox_PwrE_NoElbow
+No_Elbow,PwrE,Powered Elbow,,No Elbow,,,Checkbox_No_Elbow
 PwrE_UtahArm3,PwrE,Powered Elbow,Fillauer,Utah Arm 3+,2,(50100[39-41]),Checkbox_PwrE_UtahArm3
 HybE_AxonArmErgo,HybE,Hybrid Elbow,Ottobock,AxonArm Ergo,1,(12K501),Checkbox_HybE_AxonArmErgo
 HybE_ErgoArmElectronicplus,HybE,Hybrid Elbow,Ottobock,ErgoArm Electronic Plus,1,(12K50),Checkbox_HybE_ErgoArmElectronicplus
@@ -18,7 +18,7 @@ RotW_AxonRotation,RotW,Wrist Rotation,Ottobock,AxonRotation,,(95503),Checkbox_Ro
 RotW_ElectronicWristRotator,RotW,Wrist Rotation,Ottobock,Electric Wrist Rotator,,(10S17),Checkbox_RotW_ElectronicWristRotator
 RotW_ElectronicWristRotator_MyoRotronic,RotW,Wrist Rotation,Ottobock,Electric Wrist Rotator & MyoRotronic,,(10S17 & 13E205),Checkbox_RotW_ElectronicWristRotator_MyoRotronic
 RotW_Lukearm,RotW,Wrist Rotation,Mobius,Luke Arm,,,Checkbox_RotW_Lukearm
-No_Wrist,RotW,Wrist Rotation,,No Powered Wrist,,,Checkbox_RotW_NoWrist
+No_Wrist,RotW,Wrist Rotation,,No Powered Wrist,,,Checkbox_No_Wrist
 RotW_ProWristRotator,RotW,Wrist Rotation,Fillauer,ProWrist Rotator,,(5010056),Checkbox_RotW_ProWristRotator
 RotW_ProWristRotator_ConfigUpgrade4,RotW,Wrist Rotation,Fillauer,"ProWrist Rotator & 4-Band Coaxial Plug, Simultaneous",,(5010056 & 3010871),Checkbox_RotW_ProWristRotator_ConfigUpgrade4
 RotW_ProWristRotator_ConfigUpgrade6,RotW,Wrist Rotation,Fillauer,"ProWrist Rotator & 6-Band Coaxial Plug, Sequential",,(5010056 & 3010832),Checkbox_RotW_ProWristRotator_ConfigUpgrade6
