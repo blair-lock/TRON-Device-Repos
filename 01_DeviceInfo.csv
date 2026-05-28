@@ -32,6 +32,7 @@ OCHand_AetherZeus,OCHand,Open/Close Hand,Aether,Zeus,,,Checkbox_OCHand_AetherZeu
 OCHand_AxonHook,OCHand,Open/Close Hand,Ottobock,AxonHook,,(8E5600),Checkbox_OCHand_AxonHook
 OCHand_CovviHand,OCHand,Open/Close Hand,COVVI,COVVI Hand,,,Checkbox_OCHand_CovviHand
 OCHand_Esper_Hand,OCHand,Open/Close Hand,Esper,Esper Hand,,,Checkbox_OCHand_Esper_Hand
+OCHand_MIA_Hand,OCHand,Open/Close Hand,Prensilia,MIA Hand,,,Checkbox_OCHand_MIA_Hand
 OCHand_Genesis_Hand,OCHand,Open/Close Hand,Alt-Bionics,Genesis Hand,,,Checkbox_OCHand_Genesis_Hand
 OCHand_Lukearm,OCHand,Open/Close Hand,Mobius,Luke Arm,,(includes Grip Select +/-),Checkbox_OCHand_Lukearm
 OCHand_MyoHandVariPlusSpeed,OCHand,Open/Close Hand,Ottobock,MyoHand VariPlus Speed,,(8E38=9),Checkbox_OCHand_MyoHandVariPlusSpeed
