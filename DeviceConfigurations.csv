@@ -495,6 +495,8 @@ I4,No_Elbow,RotW_StandardWristRotator_6BandCoaxialPlug,,MFHand_TASKA,J
 I4,No_Elbow,RotW_StandardWristRotator_6BandCoaxialPlug,,MFHand_TASKA_CX,J
 I5,No_Elbow,RotW_StandardWristRotator_6BandCoaxialPlug,FlxW_PoweredFlexionWrist,OCHand_ProPlusETD_ETD2,I
 I5,No_Elbow,RotW_StandardWristRotator_6BandCoaxialPlug,FlxW_PoweredFlexionWrist,OCHand_ProPlusHand,I
+Io,No_Elbow,RotW_StandardWristRotator_6BandCoaxialPlug,,OCHand_ProPlusETD_ETD2,E
+I0,No_Elbow,RotW_StandardWristRotator_6BandCoaxialPlug,,OCHand_ProPlusHand,E
 I2,No_Elbow,,FlxW_PoweredFlexionWrist,OCHand_ProPlusETD_ETD2,I
 I2,No_Elbow,,FlxW_PoweredFlexionWrist,OCHand_ProPlusHand,I
 K0,PwrE_DynamicArm,No_Wrist,,OCHand_AbilityHand,D
