@@ -1,0 +1,10 @@
+Number,Text
+1,Pattern recognition command of elbow lock/unlock is possible.
+2,Requires "Coapt Modification" from manufacturer.
+3,Required for pattern recognition grasp selection command of TASKA, Ability Hand, and some bebionic multifunction hands.
+4,Pattern recognition grasp selection only possible with WQD versions of older (Steeper-style) bebionic hands.
+5,Applicable to Quantum hands with s/n M9618 or newer.
+6,Requires an Adapter, available from Coapt. Consult with Coapt before using the Adapter with Motion Arm elbows.
+7,Proper Device Connection Cable is subject to battery placement. Consult with Coapt.
+8,Contact Vincent to ensure correct firmware version on VINCENTevolution 4 hand for multifunction capability with Coapt.
+9,Compatibility of Covvi in multifunction mode with the Alpha Control Liner System from Willowwood is not possible with Coapt at this time.
