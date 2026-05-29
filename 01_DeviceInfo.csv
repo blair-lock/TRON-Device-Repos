@@ -13,15 +13,15 @@ HybE_EspireHybrid,HybE,Hybrid Elbow,Steeper,Espire Hybrid,1,,Checkbox_HybE_Espir
 HybE_Espire_Classic_Plus,HybE,Hybrid Elbow,Steeper,Espire Classic Plus,7,,Checkbox_HybE_Espire_Classic_Plus
 HybE_MotionArmEL,HybE,Hybrid Elbow,Fillauer,Motion Arm EL,,(50101[42-44]),Checkbox_HybE_MotionArmEL
 HybE_MotionArmML,HybE,Hybrid Elbow,Fillauer,Motion Arm ML,,(50101[39-41]),Checkbox_HybE_MotionArmML
-HybE_UtahHybridArm,HybE,Hybrid Elbow,Fillauer,"Utah Hybrid Arm1,",,(50100[42-44]),Checkbox_HybE_UtahHybridArm
+HybE_UtahHybridArm,HybE,Hybrid Elbow,Fillauer,Utah Hybrid Arm,1,(50100[42-44]),Checkbox_HybE_UtahHybridArm
 RotW_AxonRotation,RotW,Wrist Rotation,Ottobock,AxonRotation,,(95503),Checkbox_RotW_AxonRotation
 RotW_ElectronicWristRotator,RotW,Wrist Rotation,Ottobock,Electric Wrist Rotator,,(10S17),Checkbox_RotW_ElectronicWristRotator
 RotW_ElectronicWristRotator_MyoRotronic,RotW,Wrist Rotation,Ottobock,Electric Wrist Rotator & MyoRotronic,,(10S17 & 13E205),Checkbox_RotW_ElectronicWristRotator_MyoRotronic
 RotW_Lukearm,RotW,Wrist Rotation,Mobius,Luke Arm,,,Checkbox_RotW_Lukearm
 No_Wrist,RotW,Wrist Rotation,,No Powered Wrist,,,Checkbox_No_Wrist
 RotW_ProWristRotator,RotW,Wrist Rotation,Fillauer,ProWrist Rotator,,(5010056),Checkbox_RotW_ProWristRotator
-RotW_ProWristRotator_ConfigUpgrade4,RotW,Wrist Rotation,Fillauer,"ProWrist Rotator & 4-Band Coaxial Plug, Simultaneous",,(5010056 & 3010871),Checkbox_RotW_ProWristRotator_ConfigUpgrade4
-RotW_ProWristRotator_ConfigUpgrade6,RotW,Wrist Rotation,Fillauer,"ProWrist Rotator & 6-Band Coaxial Plug, Sequential",,(5010056 & 3010832),Checkbox_RotW_ProWristRotator_ConfigUpgrade6
+RotW_ProWristRotator_ConfigUpgrade4,RotW,Wrist Rotation,Fillauer,ProWrist Rotator & 4-Band Coaxial Plug: Simultaneous,,(5010056 & 3010871),Checkbox_RotW_ProWristRotator_ConfigUpgrade4
+RotW_ProWristRotator_ConfigUpgrade6,RotW,Wrist Rotation,Fillauer,ProWrist Rotator & 6-Band Coaxial Plug: Sequential,,(5010056 & 3010832),Checkbox_RotW_ProWristRotator_ConfigUpgrade6
 RotW_StandardWristRotator,RotW,Wrist Rotation,Fillauer,Standard Wrist Rotator,,(5010045),Checkbox_RotW_StandardWristRotator
 RotW_StandardWristRotator_6BandCoaxialPlug,RotW,Wrist Rotation,Fillauer,Standard Wrist Rotator & 6-Band Coaxial Plug,3,(5010159),Checkbox_RotW_StandardWristRotator_6BandCoaxialPlug
 FlxW_Lukearm,FlxW,Wrist Flexion,Mobius,Luke Arm,,,Checkbox_FlxW_Lukearm
