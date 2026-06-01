@@ -1,0 +1,15 @@
+Code,ColorName,Hex,LineWidth
+A,Brown,#7f4c01,1
+B,Red,#cf0e0e,0.5
+C,Orange,#FFB507,0.5
+D,Teal,#3ae4e0,1
+E,Green,#00A400,0.5
+F,Dark Green,#005400,0.5
+G,Light Blue,#95c3fd,1
+H,Dark Blue,#0000ff,0.5
+I,Pink,#ff5db6,1
+J,Mauve,#952b9d,0.5
+K,Purple,#7f5ace,0.5
+L,Peach,#f0ba96,1
+M,Yellow Green,#D6DA56,1
+N,Grey,#7f7f7f,1
