@@ -848,6 +848,7 @@
   // ═══════════════════════════════════════════════════════════════
   // GitHub Contents API — always serves fresh content, bypasses CDN cache
   const GITHUB_API_BASE  = 'https://api.github.com/repos/blair-lock/TRON-Device-Repos/contents/';
+  const LINE_PARAMS_URL = GITHUB_API_BASE + '03_LineParameters.csv';
   const REGISTRY_URL     = GITHUB_API_BASE + '01_DeviceInfo.csv';
   const FOOTNOTES_URL    = GITHUB_API_BASE + '02_Footnotes.csv';
   const CONNECTIONS_URL  = GITHUB_API_BASE + '00_Configurations.csv';
@@ -873,7 +874,8 @@
     }
   }
   let DEVICES     = {};   // populated by loadDevices()
-  let CONNECTIONS = [];   // populated by loadConnections() — array of row objects
+  let CONNECTIONS = [];   // populated by loadConnections()
+  let LINE_PARAMS  = {};  // populated by loadLineParams() — array of row objects
 
   // Parse a CSV string into an array of row objects keyed by header.
   function parseCSV(text) {
@@ -1819,7 +1821,6 @@
     }
   }
 
-
   // Called whenever a checkbox is selected or deselected.
   // `id`      — the full checkbox element id (e.g. "Checkbox_MFHand_TASKA")
   // `checked` — boolean, true = just selected, false = just deselected
@@ -2123,23 +2124,7 @@
   }
 
 
-  // ── Connector colour lookup — one colour per letter code A–N ────────────────
-  const COLOR_CODES = {
-    'A': '#7f4c01',  // Brown
-    'B': '#cf0e0e',  // Red
-    'C': '#FFB507',  // Orange
-    'D': '#D6DA56',  // Yellow Green
-    'E': '#00A400',  // Green
-    'F': '#005400',  // Dark Green
-    'G': '#95c3fd',  // Light Blue
-    'H': '#0000ff',  // Dark Blue
-    'I': '#ff5db6',  // Pink
-    'J': '#952b9d',  // Mauve
-    'K': '#7f5ace',  // Purple
-    'L': '#f0ba96',  // Peach
-    'M': '#3ae4e0',  // Teal
-    'N': '#7f7f7f',  // Grey
-  };
+
 
   // ── drawConnectors ────────────────────────────────────────────────────────
   // Draws one H-V-H connector path per CONNECTIONS row.
@@ -2149,10 +2134,9 @@
   function drawConnectors() {
     const svgEl  = wrapper.querySelector('svg');
     const svgRect = svgEl.getBoundingClientRect();
-    // Uniform scale: SVG viewBox width mapped to rendered pixel width
-    const scale   = vw / svgRect.width;
-    const scaleX  = scale;
-    const scaleY  = scale;
+    // Use vw/width for uniform scale — works regardless of viewBox height
+    const scaleX  = vw / svgRect.width;
+    const scaleY  = scaleX;
 
     const BUS_ELBOW = 466.5;   // x of elbow→wrist bus
     const BUS_WRIST = 734.4;   // x of wrist→hand (OCHand) bus
@@ -2168,20 +2152,16 @@
     const r  = v => Math.round(v * 10) / 10;
 
     // Get SVG y-centre of a checkbox
-    // y coord read directly from SVG attributes (already in SVG space)
-    // This avoids screen-coordinate conversion issues on mobile
     const cbY = (cbId) => {
       const el = document.getElementById(cbId);
       if (!el) return null;
       const rect = el.querySelector('.cb-box');
       if (!rect) return null;
-      const y = parseFloat(rect.getAttribute('y'));
-      const h = parseFloat(rect.getAttribute('height'));
-      return y + h / 2;
+      const br = rect.getBoundingClientRect();
+      return ((br.top + br.bottom) / 2 - svgRect.top) * scaleY;
     };
 
     // Get SVG x of right edge of a checkbox (from endpoint)
-    // x coords read directly from SVG attributes (already in SVG space)
     const cbXRight = (cbId) => {
       const el = document.getElementById(cbId);
       if (!el) return null;
@@ -2190,6 +2170,7 @@
       return parseFloat(rect.getAttribute('x')) + parseFloat(rect.getAttribute('width'));
     };
 
+    // Get SVG x of left edge of a checkbox (to endpoint)
     const cbXLeft = (cbId) => {
       const el = document.getElementById(cbId);
       if (!el) return null;
@@ -2224,7 +2205,7 @@
 
       // Colour from explicit Color Code column, fallback to Cable ID letter prefix
       const colorLetter = row.colorCode || cableId.match(/^[A-Z]/)?.[0] || '';
-      const color       = COLOR_CODES[colorLetter] || '#888888';
+      const color       = '#888888';  // fallback; overridden by LINE_PARAMS at draw time
       const allCbs  = chain.map(d => 'Checkbox_' + d);
 
       // One segment per adjacent pair in the chain
@@ -2232,6 +2213,7 @@
         segments.push({
           idx:      rowIdx * 10 + s,
           cableId,
+          colorLetter,
           fromCbId: 'Checkbox_' + chain[s],
           toCbId:   'Checkbox_' + chain[s + 1],
           color,
@@ -2254,18 +2236,22 @@
       const path = document.createElementNS(ns, 'path');
       path.setAttribute('d', d);
       path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', c.color);
-      path.setAttribute('stroke-width', String(SW));
+      const lp = LINE_PARAMS[c.colorLetter] || {};
+      const segColor = lp.color || c.color;
+      const segSW    = (lp.lineWidth && !isNaN(lp.lineWidth)) ? lp.lineWidth : SW;
+      path.setAttribute('stroke', segColor);
+      path.setAttribute('stroke-width', String(segSW));
       path.setAttribute('stroke-linecap', 'round');
       path.setAttribute('stroke-linejoin', 'round');
       path.setAttribute('vector-effect', 'non-scaling-stroke');
 
       const g = document.createElementNS(ns, 'g');
       g.setAttribute('id', `Conn_${c.idx}`);
-      g.dataset.fromCb  = c.fromCbId;
-      g.dataset.toCb    = c.toCbId;
-      g.dataset.cableId = c.cableId;
-      g.dataset.color   = c.color;
+      g.dataset.fromCb   = c.fromCbId;
+      g.dataset.toCb     = c.toCbId;
+      g.dataset.cableId  = c.cableId;
+      g.dataset.color    = segColor;
+      g.dataset.lineWidth = String(segSW);
       g.dataset.allCbs  = c.allCbs.join(',');
       g.appendChild(path);
       svgEl.appendChild(g);
@@ -2316,7 +2302,7 @@
 
       const visible = allActive && compatWithChecked;
       g.querySelectorAll('path').forEach(p => {
-        p.setAttribute('stroke-width', visible ? String(SW) : '0');
+        p.setAttribute('stroke-width', visible ? (g.dataset.lineWidth || String(SW)) : '0');
         if (visible) p.setAttribute('stroke', g.dataset.color);
       });
     });
@@ -2379,13 +2365,31 @@
     }, 100);
   }
 
+  // ── loadLineParams ────────────────────────────────────────────────────────
+  async function loadLineParams() {
+    try {
+      const text = await fetchCSVFromAPI(LINE_PARAMS_URL);
+      parseCSV(text).forEach(row => {
+        const code = row['Code']?.trim();
+        if (!code) return;
+        LINE_PARAMS[code] = {
+          color:     row['Hex']?.trim()          || '#888888',
+          lineWidth: parseFloat(row['LineWidth']) || 0.5,
+        };
+      });
+      console.log(`Line parameters loaded: ${Object.keys(LINE_PARAMS).length} codes`);
+    } catch (err) {
+      console.warn('Line parameters fetch failed, using defaults:', err);
+    }
+  }
+
   // ── initChart ─────────────────────────────────────────────────
   // Master initialisation — called once fonts are guaranteed loaded.
   // All layout-dependent work happens here.
   async function initChart() {
 
     // 1. Load device registry and connections from GitHub
-    await Promise.all([loadDevices(), loadConnections(), loadFootnotes()]);
+    await Promise.all([loadDevices(), loadConnections(), loadFootnotes(), loadLineParams()]);
 
     // 2. Draw manufacturer bands and patch SVG fonts
     drawManufacturerBands();
