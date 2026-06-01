@@ -1,7 +1,7 @@
 Code,ColorName,Hex,LineWidth
 A,Brown,#7f4c01,1
 B,Red,#cf0e0e,1
-C,Orange,#FFB507,0.5
+C,Orange,#FFB507,1
 D,Teal,#3ae4e0,1
 E,Green,#00A400,0.5
 F,Dark Green,#005400,0.5
