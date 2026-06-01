@@ -2149,9 +2149,10 @@
   function drawConnectors() {
     const svgEl  = wrapper.querySelector('svg');
     const svgRect = svgEl.getBoundingClientRect();
-    // Use vw/width for uniform scale — works regardless of viewBox height
-    const scaleX  = vw / svgRect.width;
-    const scaleY  = scaleX;
+    // Uniform scale: SVG viewBox width mapped to rendered pixel width
+    const scale   = vw / svgRect.width;
+    const scaleX  = scale;
+    const scaleY  = scale;
 
     const BUS_ELBOW = 466.5;   // x of elbow→wrist bus
     const BUS_WRIST = 734.4;   // x of wrist→hand (OCHand) bus
@@ -2167,16 +2168,20 @@
     const r  = v => Math.round(v * 10) / 10;
 
     // Get SVG y-centre of a checkbox
+    // y coord read directly from SVG attributes (already in SVG space)
+    // This avoids screen-coordinate conversion issues on mobile
     const cbY = (cbId) => {
       const el = document.getElementById(cbId);
       if (!el) return null;
       const rect = el.querySelector('.cb-box');
       if (!rect) return null;
-      const br = rect.getBoundingClientRect();
-      return ((br.top + br.bottom) / 2 - svgRect.top) * scaleY;
+      const y = parseFloat(rect.getAttribute('y'));
+      const h = parseFloat(rect.getAttribute('height'));
+      return y + h / 2;
     };
 
     // Get SVG x of right edge of a checkbox (from endpoint)
+    // x coords read directly from SVG attributes (already in SVG space)
     const cbXRight = (cbId) => {
       const el = document.getElementById(cbId);
       if (!el) return null;
@@ -2185,7 +2190,6 @@
       return parseFloat(rect.getAttribute('x')) + parseFloat(rect.getAttribute('width'));
     };
 
-    // Get SVG x of left edge of a checkbox (to endpoint)
     const cbXLeft = (cbId) => {
       const el = document.getElementById(cbId);
       if (!el) return null;
