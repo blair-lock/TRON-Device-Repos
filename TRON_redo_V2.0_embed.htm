@@ -1894,7 +1894,7 @@
     if (!defs) { defs = document.createElementNS(ns, 'defs'); svgEl.prepend(defs); }
     if (!defs.querySelector('#connector-glow')) {
       // Glow filter using userSpaceOnUse on a large fixed region
-      defs.innerHTML += `<filter id="connector-glow" x="-200" y="-200" width="2000" height="2000" filterUnits="userSpaceOnUse">
+      defs.innerHTML += `<filter id="connector-glow" x="-200" y="-200" width="2000" height="${SVG_H + 400}" filterUnits="userSpaceOnUse">
         <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
         <feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>`;
