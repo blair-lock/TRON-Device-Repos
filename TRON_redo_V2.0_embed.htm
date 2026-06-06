@@ -210,12 +210,19 @@
       height: 28px;
       overflow: visible;
     }
-    .footer-btn:hover  { filter: brightness(1.1); }
-    .footer-btn:active { filter: brightness(0.9); }
+    .footer-btn:hover  { 
+      /*filter: brightness(1.1); */
+      background-color: #ff781d;
+    }
+    .footer-btn:active { 
+      /*filter: brightness(0.9); */
+      background-color: #e55c1b;
+    }
     #btn-next[disabled] {
-      opacity: 0.35;
-      filter: saturate(0%);
-      cursor: default;
+      /*opacity: 0.35;*/
+      /*filter: saturate(0%);*/
+      background-color: #d4d4d4;
+      cursor: not-allowed;
       pointer-events: none;
     }
 
@@ -224,7 +231,7 @@
     /* ── Footer overlay ──────────────────────────────────── */
 
     .footer-btn {
-      position: absolute;
+      /*position: absolute;*/
       height: 56px;
       border-radius: 28px;
       border: none;
@@ -243,7 +250,7 @@
       padding: 0 20px;
     }
     .footer-btn:hover  { background: #d4551a; }
-    .footer-btn:active { transform: scale(0.97); }
+    /*.footer-btn:active { transform: scale(0.97); }*/
   </style>
 </head>
 <body>
