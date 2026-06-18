@@ -21,9 +21,9 @@ RotW_Lukearm,RotW,Wrist Rotation,Mobius,Luke Arm,,,Checkbox_RotW_Lukearm
 No_Wrist,RotW,Wrist Rotation,,No Powered Wrist,,,Checkbox_No_Wrist
 RotW_ProWristRotator,RotW,Wrist Rotation,Fillauer,ProWrist Rotator,,(5010056),Checkbox_RotW_ProWristRotator
 RotW_ProWristRotator_ConfigUpgrade4,RotW,Wrist Rotation,Fillauer,ProWrist Rotator & 4-Band Coaxial Plug: Simultaneous,,(5010056 & 3010871),Checkbox_RotW_ProWristRotator_ConfigUpgrade4
-RotW_ProWristRotator_ConfigUpgrade6,RotW,Wrist Rotation,Fillauer,ProWrist Rotator & 6-Band Coaxial Plug: Sequential,,(5010157),Checkbox_RotW_ProWristRotator_ConfigUpgrade6
+RotW_ProWristRotator_ConfigUpgrade6,RotW,Wrist Rotation,Fillauer,ProPlus Wrist with 6-band Coax: Sequential,,(5010157),Checkbox_RotW_ProWristRotator_ConfigUpgrade6
 RotW_StandardWristRotator,RotW,Wrist Rotation,Fillauer,Standard Wrist Rotator,,(5010045),Checkbox_RotW_StandardWristRotator
-RotW_StandardWristRotator_6BandCoaxialPlug,RotW,Wrist Rotation,Fillauer,Standard Wrist Rotator & 6-Band Coaxial Plug,3,(5010159),Checkbox_RotW_StandardWristRotator_6BandCoaxialPlug
+RotW_StandardWristRotator_6BandCoaxialPlug,RotW,Wrist Rotation,Fillauer,Motor Direct Wrist with 6-band coaxial Plug,3,(5010159),Checkbox_RotW_StandardWristRotator_6BandCoaxialPlug
 FlxW_Lukearm,FlxW,Wrist Flexion,Mobius,Luke Arm,,,Checkbox_FlxW_Lukearm
 FlxW_PoweredFlexionWrist,FlxW,Wrist Flexion,Fillauer,Powered Flexion Wrist,,(301099[3-8]),Checkbox_FlxW_PoweredFlexionWrist
 OCHand_AbilityHand,OCHand,Open/Close Hand,Psyonic,Ability Hand,,,Checkbox_OCHand_AbilityHand
