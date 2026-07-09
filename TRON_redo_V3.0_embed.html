@@ -1,0 +1,2423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compatibility Chart</title>
+  <style>
+    /* ── Connector globals ──────────────────────────────────────── */
+    :root {
+      --connector-sw: 0.5;
+      --inactive-grey: rgb(230,230,230);          /* global inactive element colour     */
+      --font-main:     'Montserrat', sans-serif; /* global font                        */
+    }
+
+    /* ── SVG Label text styles ──────────────────────────────────── */
+
+    /* ── Debug popup (temporary) ────────────────────────────────── */
+    #debug-popup {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1a1a2e;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      border-radius: 10px;
+      padding: 24px 28px 20px;
+      min-width: 340px;
+      max-width: 480px;
+      font-family: monospace;
+      font-size: 13px;
+      z-index: 9999;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      display: none;
+    }
+    #debug-popup.visible { display: block; }
+    #debug-popup h3 {
+      margin: 0 0 14px;
+      font-size: 13px;
+      color: #aaa;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    #debug-popup table { border-collapse: collapse; width: 100%; }
+    #debug-popup td { padding: 4px 8px 4px 0; vertical-align: top; }
+    #debug-popup td:first-child { color: #7eb8f7; white-space: nowrap; padding-right: 16px; }
+    #debug-popup td:last-child  { color: #f0f0a0; word-break: break-all; }
+    #debug-popup .cable-row td:last-child { color: #7fff7f; font-weight: bold; font-size: 15px; }
+    #debug-close {
+      position: absolute;
+      top: 10px; right: 14px;
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+    }
+    #debug-close:hover { color: #fff; }
+
+    /* ── Manufacturer labels ─────────────────────────────────────── */
+    [id^="mfr_label_"] { font-family: var(--font-main); font-size: 9px; font-weight: 600; fill: #555; }
+    [id^="mfr_logo_"]  { opacity: 0.85; }
+
+    /* ── Label foreignObject overflow ───────────────────────── */
+    [id^="fo_Label_"] { overflow: visible; }
+
+    /* ── Label foreignObject globals ────────────────────────────── */
+    :root {
+      --lbl-fo-h:       16px;        /* foreignObject height (matches cb-h)  */
+      --lbl-fo-pn-h:    12px;        /* _PN foreignObject height              */
+    }
+    /* Shared div inside every label foreignObject */
+    .fo-lbl-wrap {
+      display:          flex;
+      align-items:      center;
+      height:           100%;
+      white-space:      nowrap;
+      overflow:         visible;
+      font-family:      var(--font-main);
+    }
+    .fo-lbl-main {
+      font-size:        var(--label-size);
+      font-weight:      700;
+      color:            #000;
+      text-shadow:      0 0 2px #fff, 0 0 4px #fff, 0 0 7px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff;
+    }
+    .fo-lbl-main sup {
+      font-size:        5.5px;
+      vertical-align:   super;
+      line-height:      0;
+    }
+    .fo-lbl-pn {
+      font-size:        var(--pn-size);
+      font-weight:      700;
+      color:            #000;
+      align-items:      flex-start;
+      text-shadow:      0 0 2px #fff, 0 0 4px #fff, 0 0 7px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff;
+    }
+    /* ── Checkbox globals ───────────────────────────────────────── */
+    :root {
+      --cb-w:          17.5px;         /* checkbox width                    */
+      --cb-h:          17.5px;         /* checkbox height                   */
+      --cb-stroke:     1px;          /* checkbox border width             */
+      --cb-tick-sw:    1.8px;        /* tick stroke-width                 */
+
+      /* ── Label font globals ─────────────────────────────────────── */
+      --label-size:    11px;          /* main label font-size              */
+      --label-fill:    #000;         /* main label color                  */
+      --pn-size:       9px;        /* _PN sub-label font-size           */
+      --pn-fill:       #555;         /* _PN sub-label color               */
+
+      /* ── DottedLine globals ─────────────────────────────────────── */
+      --dotline-stroke: #ddd;        /* band separator line color         */
+      --dotline-sw:    1;            /* band separator stroke-width       */
+
+      /* ── Connector color palette ────────────────────────────────── */
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #fff;
+      font-family: var(--font-main);
+      width: 100%;
+    }
+
+    /* ── Canvas ──────────────────────────────────────────────── */
+    #canvas {
+      width: 100%;
+      background: #fff;
+    }
+    #canvas.grabbing { cursor: grabbing; }
+
+    #svg-wrapper {
+      width: 100%;
+    }
+    #svg-wrapper svg {
+      display: block;
+      width: 100%; height: 100%;
+      background: #fff;
+      shape-rendering: geometricPrecision;
+      text-rendering: optimizeLegibility;
+      image-rendering: optimizeQuality;
+    }
+
+    
+
+    /* ── Checkbox styles ─────────────────────────────────────── */
+
+    /* ── Label inactive state ───────────────────────────────── */
+    [id^="fo_Label_"][data-active="false"] div {
+      color: var(--inactive-grey) !important;
+    }
+
+    /* ── Connector inactive state ───────────────────────────── */
+    /* Inactive connector color handled in JS via data-color-default */
+    /* (no CSS opacity/filter — color swap is done programmatically) */
+
+    /* ── Checkbox active/inactive states ───────────────────── */
+    :root {
+      --cb-inactive-fill:   var(--inactive-grey);   /* inactive box fill   */
+      --cb-inactive-stroke: var(--inactive-grey);   /* inactive box stroke */
+    }
+
+    [id^="Checkbox_"] { cursor: pointer; }
+    [id^="Checkbox_"] .cb-box {
+      shape-rendering: crispEdges;
+      fill: #fff; stroke: #000;
+      stroke-width: var(--cb-stroke);
+    }
+    [id^="Checkbox_"]:hover .cb-box { fill: #ddeeff; }
+    [id^="Checkbox_"] .cb-tick {
+      fill: none; stroke: #000;
+      stroke-width: var(--cb-tick-sw); stroke-linecap: round;
+      stroke-linejoin: round; display: none;
+    }
+    [id^="Checkbox_"][checked="true"] .cb-tick { display: inline; }
+
+    /* Inactive: grey box, no hover, no tick, not clickable */
+    [id^="Checkbox_"][data-active="false"] {
+      cursor: default;
+      pointer-events: none;
+    }
+    [id^="Checkbox_"][data-active="false"] .cb-box {
+      fill:   var(--cb-inactive-fill);
+      stroke: var(--cb-inactive-stroke);
+    }
+    [id^="Checkbox_"][data-active="false"]:hover .cb-box {
+      fill: var(--cb-inactive-fill);
+    }
+    [id^="Checkbox_"][data-active="false"] .cb-tick { display: none; }
+
+    /* ── Hint ────────────────────────────────────────────────── */
+    .footer-btn {
+      background: #f26522;
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 11px;
+      font-weight: 600;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: filter 0.15s;
+      height: 28px;
+      overflow: visible;
+    }
+    .footer-btn:hover  { 
+      /*filter: brightness(1.1); */
+      background-color: #ff781d;
+    }
+    .footer-btn:active { 
+      /*filter: brightness(0.9); */
+      background-color: #e55c1b;
+    }
+    #btn-next[disabled] {
+      /*opacity: 0.35;*/
+      /*filter: saturate(0%);*/
+      background-color: #d4d4d4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap');
+
+    /* ── Footer overlay ──────────────────────────────────── */
+
+    .footer-btn {
+      height: 33px;
+      border-radius: 28px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-main);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #fff;
+      background: #f26522;
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .footer-btn:hover  { background: #d4551a; }
+    /*.footer-btn:active { transform: scale(0.97); }*/
+  </style>
+</head>
+<body>
+
+<div id="canvas">
+  
+  <div id="svg-wrapper">
+    <svg viewBox="0 0 1157.7 2525.9" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- SVG HEADER -->
+  <g id="svg-header">
+
+    <!-- Row 1: Above Elbow (top, full width) / Below Elbow (bottom, RotW→end) stacked -->
+    <rect x="195" y="0" width="963" height="40" fill="#2a2a2a"/>
+    <rect x="195" y="40" width="309" height="40" fill="none"/>
+  <rect x="505" y="40" width="653" height="40" fill="#737373"/>
+    <text font-family="Montserrat, sans-serif" font-size="21" font-weight="600" fill="#fff" text-anchor="middle" x="677" y="20" dominant-baseline="central">ABOVE ELBOW</text>
+    <text font-family="Montserrat, sans-serif" font-size="21" font-weight="600" fill="#fff" text-anchor="middle" x="832"  y="60" dominant-baseline="central">BELOW ELBOW</text>
+
+    <!-- Row 2: Elbow / Powered Wrist / Terminal Device -->
+    <rect x="195" y="80" width="309" height="40" fill="none"/>
+  <rect x="505" y="80" width="290" height="40" fill="none"/>
+  <rect x="796" y="80" width="362" height="40" fill="none"/>
+    <text font-family="Montserrat, sans-serif" font-size="15" font-weight="600" fill="#000" text-anchor="middle" x="350" y="100" dominant-baseline="central">ELBOW</text>
+    <text font-family="Montserrat, sans-serif" font-size="15" font-weight="600" fill="#000" text-anchor="middle" x="650" y="100" dominant-baseline="central">POWERED WRIST</text>
+    <text font-family="Montserrat, sans-serif" font-size="15" font-weight="600" fill="#000" text-anchor="middle" x="977" y="100" dominant-baseline="central">TERMINAL DEVICE</text>
+
+    <!-- Row 3: Sub-group labels -->
+    <text font-family="Montserrat, sans-serif" font-size="11" font-weight="600" fill="#000" text-anchor="start" x="203" y="144">Flexion / Extension</text>
+    <text font-family="Montserrat, sans-serif" font-size="11" font-weight="600" fill="#000" text-anchor="start" x="336" y="144">Locking / Unlocking</text>
+    <text font-family="Montserrat, sans-serif" font-size="11" font-weight="600" fill="#000" text-anchor="start" x="513" y="144">Rotation</text>
+    <text font-family="Montserrat, sans-serif" font-size="11" font-weight="600" fill="#000" text-anchor="start" x="613" y="144">Flexion / Extension</text>
+    <text font-family="Montserrat, sans-serif" font-size="11" font-weight="600" fill="#000" text-anchor="start" x="804" y="144">Open / Close Operation</text>
+    <text font-family="Montserrat, sans-serif" font-size="11" font-weight="600" fill="#000" text-anchor="start" x="1000" y="144">Multifunction Operation</text>
+
+  </g>
+  
+  
+  <g id="MFHand_CovviHand">
+    <g data-active="true" data-device-id="MFHand_CovviHand" id="Checkbox_MFHand_CovviHand" checked="false"><rect class="st12 cb-box" x="1010" y="1768" width="18" height="18"/><path class="cb-tick" d="M1013.72,1778.18 L1018.06,1782.63 L1025.27,1770.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_MFHand_CovviHand" x="1010" y="1752" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="RotW_StandardWristRotator_6BandCoaxialPlug">
+    <foreignObject data-active="true" id="fo_Label_RotW_StandardWristRotator_6BandCoaxialPlug_PN" x="522" y="1141" width="100.3" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="RotW_StandardWristRotator_6BandCoaxialPlug" id="Checkbox_RotW_StandardWristRotator_6BandCoaxialPlug" checked="false"><rect class="st12 cb-box" x="522" y="1154" width="18" height="18"/><path class="cb-tick" d="M525.72,1164.18 L530.06,1168.63 L537.27,1156.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_RotW_StandardWristRotator_6BandCoaxialPlug" x="522" y="1124" width="100.3" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="FlxW_PoweredFlexionWrist">
+    <foreignObject data-active="true" id="fo_Label_FlxW_PoweredFlexionWrist" x="623" y="1063" width="190.3" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_FlxW_PoweredFlexionWrist_PN" x="623" y="1080" width="190.3" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="FlxW_PoweredFlexionWrist" id="Checkbox_FlxW_PoweredFlexionWrist" checked="false"><rect class="st12 cb-box" x="623" y="1093" width="18" height="18"/><path class="cb-tick" d="M626.72,1103.18 L631.06,1107.63 L638.27,1095.83"/></g>
+  </g>
+  <g id="RotW_StandardWristRotator">
+    <foreignObject data-active="true" id="fo_Label_RotW_StandardWristRotator" x="522" y="1005" width="100.3" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_RotW_StandardWristRotator_PN" x="522" y="1022" width="100.3" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="RotW_StandardWristRotator" id="Checkbox_RotW_StandardWristRotator" checked="false"><rect class="st12 cb-box" x="522" y="1035" width="18" height="18"/><path class="cb-tick" d="M525.72,1045.18 L530.06,1049.63 L537.27,1037.83"/></g>
+  </g>
+  <g id="RotW_ProWristRotator">
+    <foreignObject data-active="true" id="fo_Label_RotW_ProWristRotator" x="522" y="954" width="100.3" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_RotW_ProWristRotator_PN" x="522" y="971" width="100.3" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="RotW_ProWristRotator" id="Checkbox_RotW_ProWristRotator" checked="false"><rect class="st12 cb-box" x="522" y="984" width="18" height="18"/><path class="cb-tick" d="M525.72,994.18 L530.06,998.63 L537.27,986.83"/></g>
+  </g>
+  <g id="MFHand_bebionicBB1000">
+    <foreignObject data-active="true" id="fo_Label_MFHand_bebionicBB1000_PN" x="1010" y="706" width="171.4" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_MFHand_bebionicBB1000" x="1010" y="689" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="MFHand_bebionicBB1000" id="Checkbox_MFHand_bebionicBB1000" checked="false"><rect class="st12 cb-box" x="1010" y="719" width="18" height="18"/><path class="cb-tick" d="M1013.72,729.18 L1018.06,733.63 L1025.27,721.83"/></g>
+  </g>
+  <g id="MFHand_bebionicBBHxxxQD">
+    <foreignObject data-active="true" id="fo_Label_MFHand_bebionicBBHxxxQD_PN" x="1010" y="648" width="171.4" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_MFHand_bebionicBBHxxxQD" x="1010" y="631" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="MFHand_bebionicBBHxxxQD" id="Checkbox_MFHand_bebionicBBHxxxQD" checked="false"><rect class="st12 cb-box" x="1010" y="661" width="18" height="18"/><path class="cb-tick" d="M1013.72,671.18 L1018.06,675.63 L1025.27,663.83"/></g>
+  </g>
+  <g id="HybE_UtahHybridArm">
+    <foreignObject data-active="true" id="fo_Label_HybE_UtahHybridArm" x="345" y="1059" width="177.1" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_HybE_UtahHybridArm_PN" x="345" y="1076" width="177.1" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="HybE_UtahHybridArm" id="Checkbox_HybE_UtahHybridArm" checked="false"><rect class="st12 cb-box" x="345" y="1089" width="18" height="18"/><path class="cb-tick" d="M348.72,1099.18 L353.06,1103.63 L360.27,1091.83"/></g>
+  </g>
+  <g id="HybE_MotionArmEL">
+    <g data-active="true" data-device-id="HybE_MotionArmEL" id="Checkbox_HybE_MotionArmEL" checked="false"><rect class="st12 cb-box" x="345" y="1226" width="18" height="18"/><path class="cb-tick" d="M348.72,1236.18 L353.06,1240.63 L360.27,1228.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_HybE_MotionArmEL_PN" x="345" y="1213" width="177.1" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_HybE_MotionArmEL" x="345" y="1196" width="177.1" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="HybE_MotionArmML">
+    <g data-active="true" data-device-id="HybE_MotionArmML" id="Checkbox_HybE_MotionArmML" checked="false"><rect class="st12 cb-box" x="345" y="1172" width="18" height="18"/><path class="cb-tick" d="M348.72,1182.18 L353.06,1186.63 L360.27,1174.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_HybE_MotionArmML_PN" x="345" y="1159" width="177.1" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_HybE_MotionArmML" x="345" y="1142" width="177.1" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="PwrE_UtahArm3">
+    <foreignObject data-active="true" id="fo_Label_PwrE_UtahArm3" x="212" y="1005" width="133.2" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_PwrE_UtahArm3_PN" x="212" y="1022" width="133.2" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="PwrE_UtahArm3" id="Checkbox_PwrE_UtahArm3" checked="false"><rect class="st12 cb-box" x="212" y="1035" width="18" height="18"/><path class="cb-tick" d="M215.72,1045.18 L220.06,1049.63 L227.27,1037.83"/></g>
+  </g>
+  <g id="MFHand_MIA_Hand">
+    <g data-active="true" data-device-id="MFHand_MIA_Hand" id="Checkbox_MFHand_MIA_Hand" checked="false"><rect class="st12 cb-box" x="1010" y="2127" width="18" height="18"/><path class="cb-tick" d="M1013.72,2137.18 L1018.06,2141.63 L1025.27,2129.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_MFHand_MIA_Hand" x="1010" y="2111" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="OCHand_MIA_Hand">
+    <g data-active="true" data-device-id="OCHand_MIA_Hand" id="Checkbox_OCHand_MIA_Hand" checked="false"><rect class="st12 cb-box" x="813" y="2127" width="18" height="18"/><path class="cb-tick" d="M816.72,2137.18 L821.06,2141.63 L828.27,2129.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_OCHand_MIA_Hand" x="813" y="2111" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="MFHand_Esper_Hand">
+    <g data-active="true" data-device-id="MFHand_Esper_Hand" id="Checkbox_MFHand_Esper_Hand" checked="false"><rect class="st12 cb-box" x="1010" y="2041" width="18" height="18"/><path class="cb-tick" d="M1013.72,2051.18 L1018.06,2055.63 L1025.27,2043.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_MFHand_Esper_Hand" x="1010" y="2025" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="MFHand_AetherZeus">
+    <g data-active="true" data-device-id="MFHand_AetherZeus" id="Checkbox_MFHand_AetherZeus" checked="false"><rect class="st12 cb-box" x="1010" y="1850" width="18" height="18"/><path class="cb-tick" d="M1013.72,1860.18 L1018.06,1864.63 L1025.27,1852.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_MFHand_AetherZeus" x="1010" y="1834" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="MFHand_VincentEvolution3">
+    <g data-active="true" data-device-id="MFHand_VincentEvolution3" id="Checkbox_MFHand_VincentEvolution3" checked="false"><rect class="st12 cb-box" x="1010" y="1679" width="18" height="18"/><path class="cb-tick" d="M1013.72,1689.18 L1018.06,1693.63 L1025.27,1681.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_MFHand_VincentEvolution3" x="1010" y="1663" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="MFHand_TASKA_CX">
+    <g data-active="true" data-device-id="MFHand_TASKA_CX" id="Checkbox_MFHand_TASKA_CX" checked="false"><rect class="st12 cb-box" x="1010" y="1611" width="18" height="18"/><path class="cb-tick" d="M1013.72,1621.18 L1018.06,1625.63 L1025.27,1613.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_MFHand_TASKA_CX" x="1010" y="1595" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="MFHand_TASKA">
+    <foreignObject data-active="true" id="fo_Label_MFHand_TASKA" x="1010" y="1546" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="MFHand_TASKA" id="Checkbox_MFHand_TASKA" checked="false"><rect class="st12 cb-box" x="1010" y="1562" width="18" height="18"/><path class="cb-tick" d="M1013.72,1572.18 L1018.06,1576.63 L1025.27,1564.83"/></g>
+  </g>
+  <g id="MFHand_AbilityHand">
+    <foreignObject data-active="true" id="fo_Label_MFHand_AbilityHand" x="1010" y="1468" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="MFHand_AbilityHand" id="Checkbox_MFHand_AbilityHand" checked="false"><rect class="st12 cb-box" x="1010" y="1484" width="18" height="18"/><path class="cb-tick" d="M1013.72,1494.18 L1018.06,1498.63 L1025.27,1486.83"/></g>
+  </g>
+  <g id="MFHand_iLimbQuantum">
+    <foreignObject data-active="true" id="fo_Label_MFHand_iLimbQuantum" x="1010" y="1388" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="MFHand_iLimbQuantum" id="Checkbox_MFHand_iLimbQuantum" checked="false"><rect class="st12 cb-box" x="1010" y="1404" width="18" height="18"/><path class="cb-tick" d="M1013.72,1414.18 L1018.06,1418.63 L1025.27,1406.83"/></g>
+  </g>
+  <g id="OCHand_Genesis_Hand">
+    <g data-active="true" data-device-id="OCHand_Genesis_Hand" id="Checkbox_OCHand_Genesis_Hand" checked="false"><rect class="st12 cb-box" x="813" y="2208" width="18" height="18"/><path class="cb-tick" d="M816.72,2218.18 L821.06,2222.63 L828.27,2210.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_OCHand_Genesis_Hand" x="813" y="2192" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="OCHand_Esper_Hand">
+    <g data-active="true" data-device-id="OCHand_Esper_Hand" id="Checkbox_OCHand_Esper_Hand" checked="false"><rect class="st12 cb-box" x="813" y="2041" width="18" height="18"/><path class="cb-tick" d="M816.72,2051.18 L821.06,2055.63 L828.27,2043.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_OCHand_Esper_Hand" x="813" y="2025" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="OCHand_Adams_Hand">
+    <g data-active="true" data-device-id="OCHand_Adams_Hand" id="Checkbox_OCHand_Adams_Hand" checked="false"><rect class="st12 cb-box" x="813" y="1951" width="18" height="18"/><path class="cb-tick" d="M816.72,1961.18 L821.06,1965.63 L828.27,1953.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_OCHand_Adams_Hand" x="813" y="1935" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="OCHand_CovviHand">
+    <g data-active="true" data-device-id="OCHand_CovviHand" id="Checkbox_OCHand_CovviHand" checked="false"><rect class="st12 cb-box" x="813" y="1768" width="18" height="18"/><path class="cb-tick" d="M816.72,1778.18 L821.06,1782.63 L828.27,1770.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_OCHand_CovviHand" x="813" y="1752" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="OCHand_bebionic">
+    <foreignObject data-active="true" id="fo_Label_OCHand_bebionic" x="813" y="689" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_OCHand_bebionic_PN" x="813" y="706" width="196.6" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="OCHand_bebionic" id="Checkbox_OCHand_bebionic" checked="false"><rect class="st12 cb-box" x="813" y="719" width="18" height="18"/><path class="cb-tick" d="M816.72,729.18 L821.06,733.63 L828.27,721.83"/></g>
+  </g>
+  <g id="OCHand_SensorHandSpeed">
+    <foreignObject data-active="true" id="fo_Label_OCHand_SensorHandSpeed" x="813" y="612" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_OCHand_SensorHandSpeed_PN" x="813" y="629" width="196.6" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="OCHand_SensorHandSpeed" id="Checkbox_OCHand_SensorHandSpeed" checked="false"><rect class="st12 cb-box" x="813" y="642" width="18" height="18"/><path class="cb-tick" d="M816.72,652.18 L821.06,656.63 L828.27,644.83"/></g>
+  </g>
+  <g id="OCHand_SystemElectricGreifer">
+    <foreignObject data-active="true" id="fo_Label_OCHand_SystemElectricGreifer" x="813" y="540" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_OCHand_SystemElectricGreifer_PN" x="813" y="557" width="196.6" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="OCHand_SystemElectricGreifer" id="Checkbox_OCHand_SystemElectricGreifer" checked="false"><rect class="st12 cb-box" x="813" y="570" width="18" height="18"/><path class="cb-tick" d="M816.72,580.18 L821.06,584.63 L828.27,572.83"/></g>
+  </g>
+  <g id="OCHand_MyoHandVariPlusSpeed">
+    <foreignObject data-active="true" id="fo_Label_OCHand_MyoHandVariPlusSpeed" x="813" y="470" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_OCHand_MyoHandVariPlusSpeed_PN" x="813" y="487" width="196.6" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="OCHand_MyoHandVariPlusSpeed" id="Checkbox_OCHand_MyoHandVariPlusSpeed" checked="false"><rect class="st12 cb-box" x="813" y="500" width="18" height="18"/><path class="cb-tick" d="M816.72,510.18 L821.06,514.63 L828.27,502.83"/></g>
+  </g>
+  <g id="OCHand_VincentEvolution3">
+    <foreignObject data-active="true" id="fo_Label_OCHand_VincentEvolution3" x="813" y="1663" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="OCHand_VincentEvolution3" id="Checkbox_OCHand_VincentEvolution3" checked="false"><rect class="st12 cb-box" x="813" y="1679" width="18" height="18"/><path class="cb-tick" d="M816.72,1689.18 L821.06,1693.63 L828.27,1681.83"/></g>
+  </g>
+  <g id="OCHand_TASKA">
+    <g data-active="true" data-device-id="OCHand_TASKA" id="Checkbox_OCHand_TASKA" checked="false"><rect class="st12 cb-box" x="813" y="1586" width="18" height="18"/><path class="cb-tick" d="M816.72,1596.18 L821.06,1600.63 L828.27,1588.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_OCHand_TASKA" x="813" y="1570" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="OCHand_AbilityHand">
+    <foreignObject data-active="true" id="fo_Label_OCHand_AbilityHand" x="813" y="1468" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="OCHand_AbilityHand" id="Checkbox_OCHand_AbilityHand" checked="false"><rect class="st12 cb-box" x="813" y="1484" width="18" height="18"/><path class="cb-tick" d="M816.72,1494.18 L821.06,1498.63 L828.27,1486.83"/></g>
+  </g>
+  <g id="OCHand_iLimbHands">
+    <foreignObject data-active="true" id="fo_Label_OCHand_iLimbHands" x="813" y="1388" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="OCHand_iLimbHands" id="Checkbox_OCHand_iLimbHands" checked="false"><rect class="st12 cb-box" x="813" y="1404" width="18" height="18"/><path class="cb-tick" d="M816.72,1414.18 L821.06,1418.63 L828.27,1406.83"/></g>
+  </g>
+  <g id="OCHand_ProPlusETD_ETD2">
+    <foreignObject data-active="true" id="fo_Label_OCHand_ProPlusETD_ETD2" x="813" y="1061" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="OCHand_ProPlusETD_ETD2" id="Checkbox_OCHand_ProPlusETD_ETD2" checked="false"><rect class="st12 cb-box" x="813" y="1077" width="18" height="18"/><path class="cb-tick" d="M816.72,1087.18 L821.06,1091.63 L828.27,1079.83"/></g>
+  </g>
+  <g id="OCHand_ProPlusHand">
+    <foreignObject data-active="true" id="fo_Label_OCHand_ProPlusHand" x="813" y="977" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="OCHand_ProPlusHand" id="Checkbox_OCHand_ProPlusHand" checked="false"><rect class="st12 cb-box" x="813" y="993" width="18" height="18"/><path class="cb-tick" d="M816.72,1003.18 L821.06,1007.63 L828.27,995.83"/></g>
+  </g>
+  <g id="OCHand_SystemElectricHand">
+    <foreignObject data-active="true" id="fo_Label_OCHand_SystemElectricHand" x="813" y="409" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_OCHand_SystemElectricHand_PN" x="813" y="426" width="196.6" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="OCHand_SystemElectricHand" id="Checkbox_OCHand_SystemElectricHand" checked="false"><rect class="st12 cb-box" x="813" y="439" width="18" height="18"/><path class="cb-tick" d="M816.72,449.18 L821.06,453.63 L828.27,441.83"/></g>
+  </g>
+  <g id="OCHand_AxonHook">
+    <g data-active="true" data-device-id="OCHand_AxonHook" id="Checkbox_OCHand_AxonHook" checked="false"><rect class="st12 cb-box" x="813" y="380" width="18" height="18"/><path class="cb-tick" d="M816.72,390.18 L821.06,394.63 L828.27,382.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_OCHand_AxonHook" x="813" y="350" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_OCHand_AxonHook_PN" x="813" y="367" width="196.6" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+  </g>
+  </g>
+  <g id="OCHand_Myo_Kinisi">
+    <foreignObject data-active="true" id="fo_Label_OCHand_Myo_Kinisi" x="813" y="825" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="OCHand_Myo_Kinisi" id="Checkbox_OCHand_Myo_Kinisi" checked="false"><rect class="st12 cb-box" x="813" y="841" width="18" height="18"/><path class="cb-tick" d="M816.72,851.18 L821.06,855.63 L828.27,843.83"/></g>
+  </g>
+  <g id="OCHand_Lukearm">
+    <g data-active="true" data-device-id="OCHand_Lukearm" id="Checkbox_OCHand_Lukearm" checked="false"><rect class="st12 cb-box" x="813" y="270" width="18" height="18"/><path class="cb-tick" d="M816.72,280.18 L821.06,284.63 L828.27,272.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_OCHand_Lukearm_PN" x="813" y="257" width="196.6" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_OCHand_Lukearm" x="813" y="240" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="OCHand_AetherZeus">
+    <g data-active="true" data-device-id="OCHand_AetherZeus" id="Checkbox_OCHand_AetherZeus" checked="false"><rect class="st12 cb-box" x="813" y="1850" width="18" height="18"/><path class="cb-tick" d="M816.72,1860.18 L821.06,1864.63 L828.27,1852.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_OCHand_AetherZeus" x="813" y="1834" width="196.6" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="PwrE_MotionE2Elbow">
+    <foreignObject data-active="true" id="fo_Label_PwrE_MotionE2Elbow" x="212" y="954" width="133.2" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_PwrE_MotionE2Elbow_PN" x="212" y="971" width="133.2" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="PwrE_MotionE2Elbow" id="Checkbox_PwrE_MotionE2Elbow" checked="false"><rect class="st12 cb-box" x="212" y="984" width="18" height="18"/><path class="cb-tick" d="M215.72,994.18 L220.06,998.63 L227.27,986.83"/></g>
+  </g>
+  <g id="HybE_EspireHybrid">
+    <g data-active="true" data-device-id="HybE_EspireHybrid" id="Checkbox_HybE_EspireHybrid" checked="false"><rect class="st12 cb-box" x="345" y="850" width="18" height="18"/><path class="cb-tick" d="M348.72,860.18 L353.06,864.63 L360.27,852.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_HybE_EspireHybrid" x="345" y="834" width="177.1" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="HybE_Espire_Classic_Plus">
+    <g data-active="true" data-device-id="HybE_Espire_Classic_Plus" id="Checkbox_HybE_Espire_Classic_Plus" checked="false"><rect class="st12 cb-box" x="345" y="903" width="18" height="18"/><path class="cb-tick" d="M348.72,913.18 L353.06,917.63 L360.27,905.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_HybE_Espire_Classic_Plus" x="345" y="887" width="177.1" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="PwrE_EspirePro">
+    <foreignObject data-active="true" id="fo_Label_PwrE_EspirePro" x="212" y="790" width="133.2" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="PwrE_EspirePro" id="Checkbox_PwrE_EspirePro" checked="false"><rect class="st12 cb-box" x="212" y="806" width="18" height="18"/><path class="cb-tick" d="M215.72,816.18 L220.06,820.63 L227.27,808.83"/></g>
+  </g>
+  <g id="PwrE_DynamicArmPlus">
+    <foreignObject data-active="true" id="fo_Label_PwrE_DynamicArmPlus" x="212" y="596" width="133.2" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_PwrE_DynamicArmPlus_PN" x="212" y="613" width="133.2" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="PwrE_DynamicArmPlus" id="Checkbox_PwrE_DynamicArmPlus" checked="false"><rect class="st12 cb-box" x="212" y="626" width="18" height="18"/><path class="cb-tick" d="M215.72,636.18 L220.06,640.63 L227.27,628.83"/></g>
+  </g>
+  <g id="PwrE_DynamicArm">
+    <foreignObject data-active="true" id="fo_Label_PwrE_DynamicArm" x="212" y="545" width="133.2" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_PwrE_DynamicArm_PN" x="212" y="562" width="133.2" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="PwrE_DynamicArm" id="Checkbox_PwrE_DynamicArm" checked="false"><rect class="st12 cb-box" x="212" y="575" width="18" height="18"/><path class="cb-tick" d="M215.72,585.18 L220.06,589.63 L227.27,577.83"/></g>
+  </g>
+  <g id="HybE_ErgoArmElectronicplus">
+    <foreignObject data-active="true" id="fo_Label_HybE_ErgoArmElectronicplus" x="345" y="433" width="177.1" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_HybE_ErgoArmElectronicplus_PN" x="345" y="450" width="177.1" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="HybE_ErgoArmElectronicplus" id="Checkbox_HybE_ErgoArmElectronicplus" checked="false"><rect class="st12 cb-box" x="345" y="463" width="18" height="18"/><path class="cb-tick" d="M348.72,473.18 L353.06,477.63 L360.27,465.83"/></g>
+  </g>
+  <g id="HybE_ErgoArmHybridplus">
+    <g data-active="true" data-device-id="HybE_ErgoArmHybridplus" id="Checkbox_HybE_ErgoArmHybridplus" checked="false"><rect class="st12 cb-box" x="345" y="404" width="18" height="18"/><path class="cb-tick" d="M348.72,414.18 L353.06,418.63 L360.27,406.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_HybE_ErgoArmHybridplus" x="345" y="374" width="177.1" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_HybE_ErgoArmHybridplus_PN" x="345" y="391" width="177.1" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+  </g>
+  <g id="RotW_ProWristRotator_ConfigUpgrade6">
+    <g data-active="true" data-device-id="RotW_ProWristRotator_ConfigUpgrade6" id="Checkbox_RotW_ProWristRotator_ConfigUpgrade6" checked="false"><rect class="st12 cb-box" x="522" y="1301" width="18" height="18"/><path class="cb-tick" d="M525.72,1311.18 L530.06,1315.63 L537.27,1303.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_RotW_ProWristRotator_ConfigUpgrade6_PN" x="522" y="1288" width="100.3" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_RotW_ProWristRotator_ConfigUpgrade6" x="522" y="1271" width="100.3" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="RotW_ProWristRotator_ConfigUpgrade4">
+    <g data-active="true" data-device-id="RotW_ProWristRotator_ConfigUpgrade4" id="Checkbox_RotW_ProWristRotator_ConfigUpgrade4" checked="false"><rect class="st12 cb-box" x="522" y="1226" width="18" height="18"/><path class="cb-tick" d="M525.72,1236.18 L530.06,1240.63 L537.27,1228.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_RotW_ProWristRotator_ConfigUpgrade4_PN" x="522" y="1213" width="100.3" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_RotW_ProWristRotator_ConfigUpgrade4" x="522" y="1196" width="100.3" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="RotW_ElectronicWristRotator_MyoRotronic">
+    <foreignObject data-active="true" id="fo_Label_RotW_ElectronicWristRotator_MyoRotronic" x="522" y="374" width="100.3" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_RotW_ElectronicWristRotator_MyoRotronic_PN" x="522" y="391" width="100.3" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <g data-active="true" data-device-id="RotW_ElectronicWristRotator_MyoRotronic" id="Checkbox_RotW_ElectronicWristRotator_MyoRotronic" checked="false"><rect class="st12 cb-box" x="522" y="404" width="18" height="18"/><path class="cb-tick" d="M525.72,414.18 L530.06,418.63 L537.27,406.83"/></g>
+  </g>
+  <g id="RotW_ElectronicWristRotator">
+    <g data-active="true" data-device-id="RotW_ElectronicWristRotator" id="Checkbox_RotW_ElectronicWristRotator" checked="false"><rect class="st12 cb-box" x="522" y="595" width="18" height="18"/><path class="cb-tick" d="M525.72,605.18 L530.06,609.63 L537.27,597.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_RotW_ElectronicWristRotator" x="522" y="565" width="100.3" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_RotW_ElectronicWristRotator_PN" x="522" y="582" width="100.3" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+  </g>
+  <g id="MFHand_MichelangeloHand">
+    <g data-active="true" data-device-id="MFHand_MichelangeloHand" id="Checkbox_MFHand_MichelangeloHand" checked="false"><rect class="st12 cb-box" x="1010" y="340" width="18" height="18"/><path class="cb-tick" d="M1013.72,350.18 L1018.06,354.63 L1025.27,342.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_MFHand_MichelangeloHand_PN" x="1010" y="327" width="171.4" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_MFHand_MichelangeloHand" x="1010" y="310" width="171.4" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="RotW_AxonRotation">
+    <g data-active="true" data-device-id="RotW_AxonRotation" id="Checkbox_RotW_AxonRotation" checked="false"><rect class="st12 cb-box" x="522" y="340" width="18" height="18"/><path class="cb-tick" d="M525.72,350.18 L530.06,354.63 L537.27,342.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_RotW_AxonRotation" x="522" y="310" width="100.3" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_RotW_AxonRotation_PN" x="522" y="327" width="100.3" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+  </g>
+  <g id="HybE_AxonArmErgo">
+    <g data-active="true" data-device-id="HybE_AxonArmErgo" id="Checkbox_HybE_AxonArmErgo" checked="false"><rect class="st12 cb-box" x="345" y="340" width="18" height="18"/><path class="cb-tick" d="M348.72,350.18 L353.06,354.63 L360.27,342.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_HybE_AxonArmErgo" x="345" y="310" width="177.1" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <foreignObject data-active="true" id="fo_Label_HybE_AxonArmErgo_PN" x="345" y="327" width="177.1" height="13.0"><div class="fo-lbl-wrap fo-lbl-pn"></div></foreignObject>
+  </g>
+  <g id="FlxW_Lukearm">
+    <foreignObject data-active="true" id="fo_Label_FlxW_Lukearm" x="623" y="254" width="190.3" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="FlxW_Lukearm" id="Checkbox_FlxW_Lukearm" checked="false"><rect class="st12 cb-box" x="623" y="270" width="18" height="18"/><path class="cb-tick" d="M626.72,280.18 L631.06,284.63 L638.27,272.83"/></g>
+  </g>
+  <g id="RotW_Lukearm">
+    <foreignObject data-active="true" id="fo_Label_RotW_Lukearm" x="522" y="254" width="100.3" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="RotW_Lukearm" id="Checkbox_RotW_Lukearm" checked="false"><rect class="st12 cb-box" x="522" y="270" width="18" height="18"/><path class="cb-tick" d="M525.72,280.18 L530.06,284.63 L537.27,272.83"/></g>
+  </g>
+  <g id="PwrE_Lukearm">
+    <foreignObject data-active="true" id="fo_Label_PwrE_Lukearm" x="212" y="254" width="133.2" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="PwrE_Lukearm" id="Checkbox_PwrE_Lukearm" checked="false"><rect class="st12 cb-box" x="212" y="270" width="18" height="18"/><path class="cb-tick" d="M215.72,280.18 L220.06,284.63 L227.27,272.83"/></g>
+  </g>
+  
+  
+  <g id="No_Elbow">
+    <g data-active="true" data-device-id="No_Elbow" id="Checkbox_No_Elbow" checked="false"><rect class="st12 cb-box" x="290" y="203" width="18" height="18"/><path class="cb-tick" d="M293.72,213.18 L298.06,217.63 L305.27,205.83"/></g>
+    <foreignObject data-active="true" id="fo_Label_No_Elbow" x="290" y="187" width="212.2" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+  </g>
+  <g id="No_Wrist">
+    <foreignObject data-active="true" id="fo_Label_No_Wrist" x="571" y="186" width="213.9" height="16.0"><div class="fo-lbl-wrap fo-lbl-main"></div></foreignObject>
+    <g data-active="true" data-device-id="No_Wrist" id="Checkbox_No_Wrist" checked="false"><rect class="st12 cb-box" x="571" y="202" width="18" height="18"/><path class="cb-tick" d="M574.72,212.18 L579.06,216.63 L586.27,204.83"/></g>
+  </g>
+
+  
+
+  <foreignObject id="fo-footnotes" x="456" y="0" width="690" height="220">
+    <div
+         style="font-family: var(--font-main); font-size:7.5px; line-height:1.5;
+                color:#333; width:100%; height:100%; overflow:visible;"></div>
+  </foreignObject>
+  <foreignObject id="fo-clear-all" x="27" y="0" width="200" height="40">
+    <div style="width:100%;height:100%;display:flex;align-items:center;">
+      <button id="btn-clear-all" class="footer-btn">CLEAR</button>
+    </div>
+  </foreignObject>
+  <foreignObject id="fo-next" x="140" y="0" width="150" height="40">
+    <div style="width:100%;height:100%;display:flex;align-items:center;">
+      <button id="btn-next" class="footer-btn" disabled>NEXT</button>
+    </div>
+  </foreignObject>
+</svg>
+  </div>
+</div>
+<script>
+  // ===============================================================
+  // CompatibilityChart - runtime initialisation
+  // All code that depends on rendered layout or browser environment
+  // lives here, called from initChart() after fonts are loaded.
+  // ===============================================================
+
+  // -- Constants -------------------------------------------------
+  const SVG_W = 1157.7, SVG_H = 2525.9;
+
+  // -- GitHub API URLs --------------------------------------------------
+  const GITHUB_API_BASE  = 'https://api.github.com/repos/blair-lock/TRON-Device-Repos/contents/';
+  const REGISTRY_URL     = GITHUB_API_BASE + '01_DeviceInfo.csv';
+  const FOOTNOTES_URL    = GITHUB_API_BASE + '02_Footnotes.csv';
+  const CONNECTIONS_URL  = GITHUB_API_BASE + '00_Configurations.csv';
+  const LINE_PARAMS_URL  = GITHUB_API_BASE + '03_LineParameters.csv';
+
+  // Fetch a CSV via GitHub Contents API (always fresh), falling back to raw URL
+  async function fetchCSVFromAPI(apiUrl) {
+    const rawUrl = apiUrl
+      .replace('https://api.github.com/repos/', 'https://raw.githubusercontent.com/')
+      .replace('/contents/', '/refs/heads/main/');
+    try {
+      const res = await fetch(apiUrl, {
+        headers: { 'Accept': 'application/vnd.github.v3+json' }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return atob(json.content.replace(/\n/g, ''));
+    } catch (err) {
+      const res = await fetch(rawUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.text();
+    }
+  }
+
+  let DEVICES     = {};
+  let CONNECTIONS = [];
+  let LINE_PARAMS = {};
+
+  // -- Element refs ----------------------------------------------
+  const canvas   = document.getElementById('canvas');
+  const wrapper  = document.getElementById('svg-wrapper');
+
+  // -- Pan/zoom state (viewBox-based) --------------------------
+
+
+  function sizeFooterButtons() {
+    document.querySelectorAll('.footer-btn').forEach(btn => {
+      btn.style.width = 'auto';
+      btn.style.padding = '0';
+      const btnWidth = Math.round(btn.scrollWidth * 1.75);
+      btn.style.width = btnWidth + 'px';
+      const fo = btn.closest('foreignObject');
+      if (fo) fo.setAttribute('width', btnWidth + 10);
+    });
+  }
+
+  // -- bindCheckboxes --------------------------------------------
+  // Attaches click handlers to all checkbox groups.
+  // Only active checkboxes (data-active="true") can be toggled.
+  function bindCheckboxes() {
+    document.querySelectorAll('[id^="Checkbox_"]').forEach(el => {
+      el.addEventListener('mousedown', e => e.stopPropagation());
+      const handleCheckbox = e => {
+        e.stopPropagation();
+        if (e.type === 'touchend') e.preventDefault();
+        if (el.dataset.active !== 'true') return;
+        const nowChecked = el.getAttribute('checked') !== 'true';
+        el.setAttribute('checked', nowChecked ? 'true' : 'false');
+
+        // Sync linked partner (e.g. RotW_Lukearm <-> FlxW_Lukearm)
+        const partner = getLinkedPartner(el.id);
+        if (partner) {
+          const partnerEl = document.getElementById(partner);
+          if (partnerEl) partnerEl.setAttribute('checked', nowChecked ? 'true' : 'false');
+        }
+
+        // FlxW_PoweredFlexionWrist has no elbow connections - auto-select No_Elbow
+        // and run the full update pipeline for it so Next button evaluates correctly.
+        if (el.id === 'Checkbox_FlxW_PoweredFlexionWrist' && nowChecked) {
+          const noElbow = document.getElementById('Checkbox_No_Elbow');
+          if (noElbow && noElbow.getAttribute('checked') !== 'true') {
+            noElbow.setAttribute('checked', 'true');
+            onCheckboxChange(noElbow.id, true, getDevice(noElbow.id));
+          }
+        }
+
+        onCheckboxChange(el.id, nowChecked, getDevice(el.id));
+      };
+      el.addEventListener('click', handleCheckbox);
+      el.addEventListener('touchend', handleCheckbox);
+    });
+  }
+
+  // -- zoomAt ------------------------------------------------
+  // Zooms in/out anchored to a screen point (px, py).
+
+  function parseCSV(text) {
+    const [headerLine, ...rows] = text.trim().split('\n');
+    const headers = headerLine.split(',').map(h => h.trim());
+    return rows.map(row => {
+      // Handle quoted fields containing commas
+      const fields = [];
+      let cur = '', inQ = false;
+      for (const ch of row) {
+        if (ch === '"') { inQ = !inQ; }
+        else if (ch === ',' && !inQ) { fields.push(cur.trim()); cur = ''; }
+        else { cur += ch; }
+      }
+      fields.push(cur.trim());
+      return Object.fromEntries(headers.map((h, i) => [h, fields[i] ?? '']));
+    });
+  }
+
+  // Fetch the device registry CSV and populate DEVICES.
+  // Returns a Promise that resolves when DEVICES is ready.
+  async function loadDevices() {
+    try {
+      const text = await fetchCSVFromAPI(REGISTRY_URL);
+      const rows = parseCSV(text);
+      DEVICES = Object.fromEntries(rows.map(row => [row.id, {
+        id:          row.id,
+        checkboxId:  row.checkboxId,
+        type:        row.type,
+        typeLabel:   row.typeLabel,
+        manufacturer:row.manufacturer || null,
+        label:       row.label,
+        partNumber:  row.partNumber   || null,
+        footnotes:   row.footnotes ? row.footnotes.split(',').map(Number).filter(Boolean) : [],
+      }]));
+      // Update SVG PN labels from registry data
+      Object.values(DEVICES).forEach(dev => {
+        const pnEl = document.getElementById(`fo_Label_${dev.id}_PN`);
+        if (pnEl) {
+          const div = pnEl.querySelector('div');
+          if (div) div.textContent = dev.partNumber || '';
+        }
+        const lblEl = document.getElementById(`fo_Label_${dev.id}`);
+        if (lblEl) {
+          const div = lblEl.querySelector('div');
+          if (div && dev.label) {
+            div.textContent = dev.label;
+            // Build <sup> from footnotes array (handles single and comma-separated)
+            if (dev.footnotes && dev.footnotes.length > 0) {
+              const sup = document.createElement('sup');
+              sup.textContent = dev.footnotes.join(',');
+              div.appendChild(sup);
+            }
+          }
+        }
+      });
+      console.log(`Device registry loaded: ${Object.keys(DEVICES).length} devices`);
+    } catch (err) {
+      console.warn('Device registry fetch failed, using embedded fallback:', err);
+      DEVICES = {
+  "PwrE_DynamicArm": {
+    "id": "PwrE_DynamicArm",
+    "checkboxId": "Checkbox_PwrE_DynamicArm",
+    "type": "PwrE",
+    "typeLabel": "Powered Elbow",
+    "manufacturer": "Ottobock",
+    "label": "DynamicArm",
+    "partNumber": "(12K100N)",
+    "footnotes": []
+  },
+  "PwrE_DynamicArmPlus": {
+    "id": "PwrE_DynamicArmPlus",
+    "checkboxId": "Checkbox_PwrE_DynamicArmPlus",
+    "type": "PwrE",
+    "typeLabel": "Powered Elbow",
+    "manufacturer": "Ottobock",
+    "label": "DynamicArm Plus",
+    "partNumber": "(12K110N)",
+    "footnotes": []
+  },
+  "PwrE_EspirePro": {
+    "id": "PwrE_EspirePro",
+    "checkboxId": "Checkbox_PwrE_EspirePro",
+    "type": "PwrE",
+    "typeLabel": "Powered Elbow",
+    "manufacturer": "Steeper",
+    "label": "Espire Pro",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "PwrE_Lukearm": {
+    "id": "PwrE_Lukearm",
+    "checkboxId": "Checkbox_PwrE_Lukearm",
+    "type": "PwrE",
+    "typeLabel": "Powered Elbow",
+    "manufacturer": "Mobius",
+    "label": "Luke Arm",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "PwrE_MotionE2Elbow": {
+    "id": "PwrE_MotionE2Elbow",
+    "checkboxId": "Checkbox_PwrE_MotionE2Elbow",
+    "type": "PwrE",
+    "typeLabel": "Powered Elbow",
+    "manufacturer": "Fillauer",
+    "label": "Motion E2 Elbow",
+    "partNumber": "(5010[094-101])",
+    "footnotes": []
+  },
+  "No_Elbow": {
+    "id": "No_Elbow",
+    "checkboxId": "Checkbox_No_Elbow",
+    "type": "PwrE",
+    "typeLabel": "Powered Elbow",
+    "manufacturer": null,
+    "label": "No Elbow",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "PwrE_UtahArm3": {
+    "id": "PwrE_UtahArm3",
+    "checkboxId": "Checkbox_PwrE_UtahArm3",
+    "type": "PwrE",
+    "typeLabel": "Powered Elbow",
+    "manufacturer": "Fillauer",
+    "label": "Utah Arm 3+",
+    "partNumber": "(50100[39-41])",
+    "footnotes": [
+      2
+    ]
+  },
+  "HybE_AxonArmErgo": {
+    "id": "HybE_AxonArmErgo",
+    "checkboxId": "Checkbox_HybE_AxonArmErgo",
+    "type": "HybE",
+    "typeLabel": "Hybrid Elbow",
+    "manufacturer": "Ottobock",
+    "label": "AxonArm Ergo",
+    "partNumber": "(12K501)",
+    "footnotes": [
+      1
+    ]
+  },
+  "HybE_ErgoArmElectronicplus": {
+    "id": "HybE_ErgoArmElectronicplus",
+    "checkboxId": "Checkbox_HybE_ErgoArmElectronicplus",
+    "type": "HybE",
+    "typeLabel": "Hybrid Elbow",
+    "manufacturer": "Ottobock",
+    "label": "ErgoArm Electronic Plus",
+    "partNumber": "(12K50)",
+    "footnotes": [
+      1
+    ]
+  },
+  "HybE_ErgoArmHybridplus": {
+    "id": "HybE_ErgoArmHybridplus",
+    "checkboxId": "Checkbox_HybE_ErgoArmHybridplus",
+    "type": "HybE",
+    "typeLabel": "Hybrid Elbow",
+    "manufacturer": "Ottobock",
+    "label": "ErgoArm Hybrid Plus",
+    "partNumber": "(12K44)",
+    "footnotes": []
+  },
+  "HybE_EspireHybrid": {
+    "id": "HybE_EspireHybrid",
+    "checkboxId": "Checkbox_HybE_EspireHybrid",
+    "type": "HybE",
+    "typeLabel": "Hybrid Elbow",
+    "manufacturer": "Steeper",
+    "label": "Espire Hybrid",
+    "partNumber": null,
+    "footnotes": [
+      1
+    ]
+  },
+  "HybE_Espire_Classic_Plus": {
+    "id": "HybE_Espire_Classic_Plus",
+    "checkboxId": "Checkbox_HybE_Espire_Classic_Plus",
+    "type": "HybE",
+    "typeLabel": "Hybrid Elbow",
+    "manufacturer": "Steeper",
+    "label": "Espire Classic Plus",
+    "partNumber": null,
+    "footnotes": [
+      7
+    ]
+  },
+  "HybE_MotionArmEL": {
+    "id": "HybE_MotionArmEL",
+    "checkboxId": "Checkbox_HybE_MotionArmEL",
+    "type": "HybE",
+    "typeLabel": "Hybrid Elbow",
+    "manufacturer": "Fillauer",
+    "label": "Motion Arm EL",
+    "partNumber": "(50101[42-44])",
+    "footnotes": []
+  },
+  "HybE_MotionArmML": {
+    "id": "HybE_MotionArmML",
+    "checkboxId": "Checkbox_HybE_MotionArmML",
+    "type": "HybE",
+    "typeLabel": "Hybrid Elbow",
+    "manufacturer": "Fillauer",
+    "label": "Motion Arm ML",
+    "partNumber": "(50101[39-41])",
+    "footnotes": []
+  },
+  "HybE_UtahHybridArm": {
+    "id": "HybE_UtahHybridArm",
+    "checkboxId": "Checkbox_HybE_UtahHybridArm",
+    "type": "HybE",
+    "typeLabel": "Hybrid Elbow",
+    "manufacturer": "Fillauer",
+    "label": "Utah Hybrid Arm",
+    "partNumber": "(50100[42-44])",
+    "footnotes": []
+  },
+  "RotW_AxonRotation": {
+    "id": "RotW_AxonRotation",
+    "checkboxId": "Checkbox_RotW_AxonRotation",
+    "type": "RotW",
+    "typeLabel": "Wrist Rotation",
+    "manufacturer": "Ottobock",
+    "label": "AxonRotation",
+    "partNumber": "(95503)",
+    "footnotes": []
+  },
+  "RotW_ElectronicWristRotator": {
+    "id": "RotW_ElectronicWristRotator",
+    "checkboxId": "Checkbox_RotW_ElectronicWristRotator",
+    "type": "RotW",
+    "typeLabel": "Wrist Rotation",
+    "manufacturer": "Ottobock",
+    "label": "Electric Wrist Rotator",
+    "partNumber": "(10S17)",
+    "footnotes": []
+  },
+  "RotW_ElectronicWristRotator_MyoRotronic": {
+    "id": "RotW_ElectronicWristRotator_MyoRotronic",
+    "checkboxId": "Checkbox_RotW_ElectronicWristRotator_MyoRotronic",
+    "type": "RotW",
+    "typeLabel": "Wrist Rotation",
+    "manufacturer": "Ottobock",
+    "label": "Electric Wrist Rotator & MyoRotronic",
+    "partNumber": "(10S17 & 13E205)",
+    "footnotes": []
+  },
+  "RotW_Lukearm": {
+    "id": "RotW_Lukearm",
+    "checkboxId": "Checkbox_RotW_Lukearm",
+    "type": "RotW",
+    "typeLabel": "Wrist Rotation",
+    "manufacturer": "Mobius",
+    "label": "Luke Arm",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "No_Wrist": {
+    "id": "No_Wrist",
+    "checkboxId": "Checkbox_No_Wrist",
+    "type": "RotW",
+    "typeLabel": "Wrist Rotation",
+    "manufacturer": null,
+    "label": "No Powered Wrist",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "RotW_ProWristRotator": {
+    "id": "RotW_ProWristRotator",
+    "checkboxId": "Checkbox_RotW_ProWristRotator",
+    "type": "RotW",
+    "typeLabel": "Wrist Rotation",
+    "manufacturer": "Fillauer",
+    "label": "ProWrist Rotator",
+    "partNumber": "(5010056)",
+    "footnotes": []
+  },
+  "RotW_ProWristRotator_ConfigUpgrade4": {
+    "id": "RotW_ProWristRotator_ConfigUpgrade4",
+    "checkboxId": "Checkbox_RotW_ProWristRotator_ConfigUpgrade4",
+    "type": "RotW",
+    "typeLabel": "Wrist Rotation",
+    "manufacturer": "Fillauer",
+    "label": "ProWrist Rotator & 4-Band Coaxial Plug, Simultaneous",
+    "partNumber": "(5010056 & 3010871)",
+    "footnotes": []
+  },
+  "RotW_ProWristRotator_ConfigUpgrade6": {
+    "id": "RotW_ProWristRotator_ConfigUpgrade6",
+    "checkboxId": "Checkbox_RotW_ProWristRotator_ConfigUpgrade6",
+    "type": "RotW",
+    "typeLabel": "Wrist Rotation",
+    "manufacturer": "Fillauer",
+    "label": "ProWrist Rotator & 6-Band Coaxial Plug, Sequential",
+    "partNumber": "(5010056 & 3010832)",
+    "footnotes": []
+  },
+  "RotW_StandardWristRotator": {
+    "id": "RotW_StandardWristRotator",
+    "checkboxId": "Checkbox_RotW_StandardWristRotator",
+    "type": "RotW",
+    "typeLabel": "Wrist Rotation",
+    "manufacturer": "Fillauer",
+    "label": "Standard Wrist Rotator",
+    "partNumber": "(5010045)",
+    "footnotes": []
+  },
+  "RotW_StandardWristRotator_6BandCoaxialPlug": {
+    "id": "RotW_StandardWristRotator_6BandCoaxialPlug",
+    "checkboxId": "Checkbox_RotW_StandardWristRotator_6BandCoaxialPlug",
+    "type": "RotW",
+    "typeLabel": "Wrist Rotation",
+    "manufacturer": "Fillauer",
+    "label": "Standard Wrist Rotator & 6-Band Coaxial Plug",
+    "partNumber": "(5010045 & 3010869)",
+    "footnotes": [
+      3
+    ]
+  },
+  "FlxW_Lukearm": {
+    "id": "FlxW_Lukearm",
+    "checkboxId": "Checkbox_FlxW_Lukearm",
+    "type": "FlxW",
+    "typeLabel": "Wrist Flexion",
+    "manufacturer": "Mobius",
+    "label": "Luke Arm",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "FlxW_PoweredFlexionWrist": {
+    "id": "FlxW_PoweredFlexionWrist",
+    "checkboxId": "Checkbox_FlxW_PoweredFlexionWrist",
+    "type": "FlxW",
+    "typeLabel": "Wrist Flexion",
+    "manufacturer": "Fillauer",
+    "label": "Powered Flexion Wrist",
+    "partNumber": "(301099[3-8])",
+    "footnotes": []
+  },
+  "OCHand_AbilityHand": {
+    "id": "OCHand_AbilityHand",
+    "checkboxId": "Checkbox_OCHand_AbilityHand",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Psyonic",
+    "label": "Ability Hand",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_Adams_Hand": {
+    "id": "OCHand_Adams_Hand",
+    "checkboxId": "Checkbox_OCHand_Adams_Hand",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "BionIT",
+    "label": "Adam's Hand",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_AetherZeus": {
+    "id": "OCHand_AetherZeus",
+    "checkboxId": "Checkbox_OCHand_AetherZeus",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Aether",
+    "label": "Zeus",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_AxonHook": {
+    "id": "OCHand_AxonHook",
+    "checkboxId": "Checkbox_OCHand_AxonHook",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Ottobock",
+    "label": "AxonHook",
+    "partNumber": "(8E5600)",
+    "footnotes": []
+  },
+  "OCHand_CovviHand": {
+    "id": "OCHand_CovviHand",
+    "checkboxId": "Checkbox_OCHand_CovviHand",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "COVVI",
+    "label": "COVVI Hand",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_Esper_Hand": {
+    "id": "OCHand_Esper_Hand",
+    "checkboxId": "Checkbox_OCHand_Esper_Hand",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Esper",
+    "label": "Esper Hand",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_MIA_Hand": {
+    "id": "OCHand_MIA_Hand",
+    "checkboxId": "Checkbox_OCHand_MIA_Hand",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Prensilia",
+    "label": "MIA Hand",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_Genesis_Hand": {
+    "id": "OCHand_Genesis_Hand",
+    "checkboxId": "Checkbox_OCHand_Genesis_Hand",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Alt-Bionics",
+    "label": "Genesis Hand",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_Lukearm": {
+    "id": "OCHand_Lukearm",
+    "checkboxId": "Checkbox_OCHand_Lukearm",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Mobius",
+    "label": "Luke Arm",
+    "partNumber": "(includes Grip Select +/-)",
+    "footnotes": []
+  },
+  "OCHand_MyoHandVariPlusSpeed": {
+    "id": "OCHand_MyoHandVariPlusSpeed",
+    "checkboxId": "Checkbox_OCHand_MyoHandVariPlusSpeed",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Ottobock",
+    "label": "MyoHand VariPlus Speed",
+    "partNumber": "(8E38=9)",
+    "footnotes": []
+  },
+  "OCHand_Myo_Kinisi": {
+    "id": "OCHand_Myo_Kinisi",
+    "checkboxId": "Checkbox_OCHand_Myo_Kinisi",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Steeper",
+    "label": "Myo Kinisi",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_ProPlusETD_ETD2": {
+    "id": "OCHand_ProPlusETD_ETD2",
+    "checkboxId": "Checkbox_OCHand_ProPlusETD_ETD2",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Fillauer",
+    "label": "ProPlus ETD/ETD",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_ProPlusHand": {
+    "id": "OCHand_ProPlusHand",
+    "checkboxId": "Checkbox_OCHand_ProPlusHand",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Fillauer",
+    "label": "ProPlus Hand",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_SensorHandSpeed": {
+    "id": "OCHand_SensorHandSpeed",
+    "checkboxId": "Checkbox_OCHand_SensorHandSpeed",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Ottobock",
+    "label": "SensorHand Speed",
+    "partNumber": "(8E38=8)",
+    "footnotes": []
+  },
+  "OCHand_SystemElectricGreifer": {
+    "id": "OCHand_SystemElectricGreifer",
+    "checkboxId": "Checkbox_OCHand_SystemElectricGreifer",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Ottobock",
+    "label": "System Electric Greifer",
+    "partNumber": "(8E33/4=7/9)",
+    "footnotes": []
+  },
+  "OCHand_SystemElectricHand": {
+    "id": "OCHand_SystemElectricHand",
+    "checkboxId": "Checkbox_OCHand_SystemElectricHand",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Ottobock",
+    "label": "System Electric Hand",
+    "partNumber": "(8E38=7)",
+    "footnotes": []
+  },
+  "OCHand_TASKA": {
+    "id": "OCHand_TASKA",
+    "checkboxId": "Checkbox_OCHand_TASKA",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "TASKA",
+    "label": "TASKA (any)",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_VincentEvolution3": {
+    "id": "OCHand_VincentEvolution3",
+    "checkboxId": "Checkbox_OCHand_VincentEvolution3",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Vincent",
+    "label": "VincentEvolution3/3+/4",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "OCHand_bebionic": {
+    "id": "OCHand_bebionic",
+    "checkboxId": "Checkbox_OCHand_bebionic",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Ottobock",
+    "label": "bebionic",
+    "partNumber": "(any)",
+    "footnotes": []
+  },
+  "OCHand_iLimbHands": {
+    "id": "OCHand_iLimbHands",
+    "checkboxId": "Checkbox_OCHand_iLimbHands",
+    "type": "OCHand",
+    "typeLabel": "Open/Close Hand",
+    "manufacturer": "Ossur",
+    "label": "i-Limb Hands",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "MFHand_AbilityHand": {
+    "id": "MFHand_AbilityHand",
+    "checkboxId": "Checkbox_MFHand_AbilityHand",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "Psyonic",
+    "label": "Ability Hand",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "MFHand_AetherZeus": {
+    "id": "MFHand_AetherZeus",
+    "checkboxId": "Checkbox_MFHand_AetherZeus",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "Aether",
+    "label": "Zeus",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "MFHand_CovviHand": {
+    "id": "MFHand_CovviHand",
+    "checkboxId": "Checkbox_MFHand_CovviHand",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "COVVI",
+    "label": "COVVI Hand",
+    "partNumber": null,
+    "footnotes": [
+      9
+    ]
+  },
+  "MFHand_Esper_Hand": {
+    "id": "MFHand_Esper_Hand",
+    "checkboxId": "Checkbox_MFHand_Esper_Hand",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "Esper",
+    "label": "Esper Hand",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "MFHand_MIA_Hand": {
+    "id": "MFHand_MIA_Hand",
+    "checkboxId": "Checkbox_MFHand_MIA_Hand",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "Prensilia",
+    "label": "MIA Hand",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "MFHand_MichelangeloHand": {
+    "id": "MFHand_MichelangeloHand",
+    "checkboxId": "Checkbox_MFHand_MichelangeloHand",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "Ottobock",
+    "label": "Michelangelo Hand",
+    "partNumber": "(8E500)",
+    "footnotes": []
+  },
+  "MFHand_TASKA": {
+    "id": "MFHand_TASKA",
+    "checkboxId": "Checkbox_MFHand_TASKA",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "TASKA",
+    "label": "TASKA",
+    "partNumber": null,
+    "footnotes": []
+  },
+  "MFHand_TASKA_CX": {
+    "id": "MFHand_TASKA_CX",
+    "checkboxId": "Checkbox_MFHand_TASKA_CX",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "TASKA",
+    "label": "TASKA CX",
+    "partNumber": null,
+    "footnotes": [
+      6
+    ]
+  },
+  "MFHand_VincentEvolution3": {
+    "id": "MFHand_VincentEvolution3",
+    "checkboxId": "Checkbox_MFHand_VincentEvolution3",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "Vincent",
+    "label": "VincentEvolution3/4",
+    "partNumber": null,
+    "footnotes": [
+      8
+    ]
+  },
+  "MFHand_bebionicBB1000": {
+    "id": "MFHand_bebionicBB1000",
+    "checkboxId": "Checkbox_MFHand_bebionicBB1000",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "Ottobock",
+    "label": "bebionic 4-band",
+    "partNumber": "(8E7x)",
+    "footnotes": []
+  },
+  "MFHand_bebionicBBHxxxQD": {
+    "id": "MFHand_bebionicBBHxxxQD",
+    "checkboxId": "Checkbox_MFHand_bebionicBBHxxxQD",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "Ottobock",
+    "label": "bebionic 6-band",
+    "partNumber": "(BBHxxxQD)",
+    "footnotes": [
+      4
+    ]
+  },
+  "MFHand_iLimbQuantum": {
+    "id": "MFHand_iLimbQuantum",
+    "checkboxId": "Checkbox_MFHand_iLimbQuantum",
+    "type": "MFHand",
+    "typeLabel": "Multi-Function Hand",
+    "manufacturer": "Ossur",
+    "label": "i-Limb Quantum",
+    "partNumber": null,
+    "footnotes": [
+      5
+    ]
+  }
+};
+      // Patch DOM labels from fallback data too
+      Object.values(DEVICES).forEach(dev => {
+        const pnEl = document.getElementById(`fo_Label_${dev.id}_PN`);
+        if (pnEl) { const d = pnEl.querySelector('div'); if (d) d.textContent = dev.partNumber || ''; }
+        const lblEl = document.getElementById(`fo_Label_${dev.id}`);
+        if (lblEl) {
+          const d = lblEl.querySelector('div');
+          if (d && dev.label) {
+            d.textContent = dev.label;
+            if (dev.footnotes && dev.footnotes.length > 0) {
+              const sup = document.createElement('sup');
+              sup.textContent = dev.footnotes.join(',');
+              d.appendChild(sup);
+            }
+          }
+        }
+      });
+    }
+  }
+
+  // Fetch the device connections CSV and populate CONNECTIONS.
+  // Schema: Cable ID, Elbow, Wrist, Wrist Aux, Hand
+  async function loadConnections() {
+    try {
+      const text = await fetchCSVFromAPI(CONNECTIONS_URL);
+      CONNECTIONS = parseCSV(text).map(row => ({
+        cableId:   row['Cable ID'],
+        elbow:     row['Elbow']      || null,
+        wrist:     row['Wrist']      || null,
+        wristAux:  row['Wrist Aux']  || null,
+        hand:      row['Hand']       || null,
+        colorCode: row['Color Code']?.trim() || '',
+        gen2Level: row['Gen2 Level']?.trim() || '',
+      }));
+      console.log(`Device connections loaded: ${CONNECTIONS.length} rows`);
+    } catch (err) {
+      console.warn('Device connections fetch failed:', err);
+    }
+  }
+
+
+  // -- Compatibility helpers --------------------------------------
+  // Column groups for the three selection categories
+  const ELBOW_COLS  = ['PwrE', 'HybE'];
+  const WRIST_COLS  = ['RotW', 'FlxW'];
+  const HAND_COLS   = ['OCHand', 'MFHand'];
+  const ALL_COLS    = [...ELBOW_COLS, ...WRIST_COLS, ...HAND_COLS];
+
+  // Given a device id like "PwrE_UtahArm3", return its column ("PwrE").
+  // Special cases: No_Elbow -> treated as PwrE, No_Wrist -> treated as RotW
+  // for group classification purposes.
+  function colOf(deviceId) {
+    if (!deviceId) return null;
+    const prefix = deviceId.split('_')[0];
+    if (prefix === 'Elbow') return 'PwrE';   // No_Elbow -> elbow group
+    if (prefix === 'Wrist') return 'RotW';   // No_Wrist -> wrist group
+    return prefix;
+  }
+
+  // Return which selection group a device belongs to: 'elbow', 'wrist', or 'hand'
+  function groupOf(deviceId) {
+    if (!deviceId) return null;
+    const prefix = deviceId.split('_')[0];
+    if (prefix === 'No') return deviceId === 'No_Elbow' ? 'elbow' : 'wrist';
+    if (['PwrE', 'HybE'].includes(prefix))     return 'elbow';
+    if (['RotW', 'FlxW'].includes(prefix))     return 'wrist';
+    if (['OCHand', 'MFHand'].includes(prefix)) return 'hand';
+    return null;
+  }
+
+  // Return all currently checked device ids, keyed by group.
+  // For wrist: if both a RotW_* and FlxW_PoweredFlexionWrist are checked,
+  // wrist = the RotW_* and wristAux = FlxW_PoweredFlexionWrist.
+  function getCheckedByGroup() {
+    const result = { elbow: null, wrist: null, wristAux: null, hand: null };
+    document.querySelectorAll('[id^="Checkbox_"][checked="true"]').forEach(el => {
+      const devId = el.dataset.deviceId;
+      const group = groupOf(devId);
+      if (!group) return;
+      if (group === 'wrist') {
+        if (devId === 'FlxW_PoweredFlexionWrist') {
+          // Always treat as aux - will be promoted to wrist if no RotW_ found
+          result.wristAux = devId;
+        } else {
+          result.wrist = devId;
+        }
+      } else {
+        result[group] = devId;
+      }
+    });
+    // If only FlxW_PoweredFlexionWrist is checked (no RotW_), promote it to wrist
+    if (!result.wrist && result.wristAux) {
+      result.wrist    = result.wristAux;
+      result.wristAux = null;
+    }
+    return result;
+  }
+
+  // Filter CONNECTIONS rows to those compatible with current selections.
+  // New schema: each row has elbow, wrist, wristAux, hand fields.
+  // A row matches if its field explicitly equals the selected device.
+  // Null selection = any row passes for that group.
+  // Filter rows compatible with current selections.
+  // wristAux (FlxW_PoweredFlexionWrist) is passed separately - a row must
+  // satisfy BOTH wrist and wristAux when both are selected.
+  function getCompatibleRows(elbow, wrist, hand, wristAux) {
+    return CONNECTIONS.filter(row => {
+      const elbowMatch = !elbow    || row.elbow === elbow;
+      const wristMatch = !wrist    || row.wrist === wrist || row.wristAux === wrist;
+      const auxMatch   = !wristAux || row.wristAux === wristAux || row.wrist === wristAux;
+      const handMatch  = !hand     || row.hand  === hand;
+      // If both wrist and wristAux selected, row must contain both
+      const bothWrists = wrist && wristAux
+        ? (row.wrist === wrist && row.wristAux === wristAux) ||
+          (row.wrist === wristAux && row.wristAux === wrist)
+        : wristMatch && auxMatch;
+      return elbowMatch && bothWrists && handMatch;
+    });
+  }
+
+  // Given a set of compatible rows, return valid device ids for a group.
+  function validDevicesForGroup(rows, group) {
+    const ids = new Set();
+    rows.forEach(row => {
+      if (group === 'elbow' && row.elbow) ids.add(row.elbow);
+      if (group === 'wrist') {
+        if (row.wrist)    ids.add(row.wrist);
+        if (row.wristAux) ids.add(row.wristAux);
+      }
+      if (group === 'hand' && row.hand) ids.add(row.hand);
+    });
+    return ids;
+  }
+
+  // Find the Cable ID for a fully-specified elbow+wrist+hand combination.
+  function findConnection(elbow, wrist, hand, wristAux) {
+    if (!elbow || !hand) return null;
+    return CONNECTIONS.find(row => {
+      const elbowOk = row.elbow === elbow;
+      const handOk  = row.hand  === hand;
+      if (wristAux) {
+        return elbowOk && handOk &&
+          ((row.wrist === wrist && row.wristAux === wristAux) ||
+           (row.wrist === wristAux && row.wristAux === wrist));
+      }
+      const wristOk = !wrist || row.wrist === wrist || row.wristAux === wrist;
+      return elbowOk && wristOk && handOk;
+    }) || null;
+  }
+
+  function findCableId(elbow, wrist, hand, wristAux) {
+    return findConnection(elbow, wrist, hand, wristAux)?.cableId || null;
+  }
+
+  // -- updateNoSelectionDevices ----------------------------------
+  // "No Elbow" and "No Wrist" are selectable only when nothing else
+  // in their category is checked. When a real device in the category
+  // is checked, they deactivate (and get unchecked).
+  function updateNoSelectionDevices() {
+    const elbowChecked = [...document.querySelectorAll(
+      '[id^="Checkbox_PwrE_"],[id^="Checkbox_HybE_"]')]
+      .some(el => el.id !== 'Checkbox_No_Elbow' &&
+                  el.getAttribute('checked') === 'true');
+
+    const wristChecked = [...document.querySelectorAll(
+      '[id^="Checkbox_RotW_"],[id^="Checkbox_FlxW_"]')]
+      .some(el => el.id !== 'Checkbox_No_Wrist' &&
+                  el.getAttribute('checked') === 'true');
+
+    window.setActive('Checkbox_No_Elbow', !elbowChecked);
+    window.setActive('Checkbox_No_Wrist', !wristChecked);
+  }
+
+  window.setActive = (id, value) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const active = value === true || value === 'true';
+    const state  = active ? 'true' : 'false';
+
+    // Checkbox
+    el.dataset.active = state;
+    if (!active) el.setAttribute('checked', 'false');
+
+    // Labels - fo_Label_<cbid> and fo_Label_<cbid>_PN
+    const cbid = id.replace('Checkbox_', '');
+    ['fo_Label_' + cbid, 'fo_Label_' + cbid + '_PN'].forEach(lid => {
+      const lel = document.getElementById(lid);
+      if (lel) lel.dataset.active = state;
+    });
+
+    // Connectors managed by updateConnectors()
+    bringCheckboxesToFront();
+
+    // Sync linked partner without recursion (pass skipPartner flag via dataset)
+    if (!el.dataset.syncingPartner) {
+      const partner = getLinkedPartner(id);
+      if (partner) {
+        const partnerEl = document.getElementById(partner);
+        if (partnerEl) {
+          el.dataset.syncingPartner = '1';
+          window.setActive(partner, value);
+          delete el.dataset.syncingPartner;
+        }
+      }
+    }
+  };
+
+  // Set all checkboxes, labels and connectors active or inactive at once.
+  window.setAllActive = (value) => {
+    const state = (value === true || value === 'true') ? 'true' : 'false';
+    const inactiveColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--inactive-grey').trim() || 'rgb(220,220,220)';
+    document.querySelectorAll('[id^="Checkbox_"]').forEach(el => {
+      el.dataset.active = state;
+      if (state === 'false') el.setAttribute('checked', 'false');
+    });
+    document.querySelectorAll('[id^="fo_Label_"]').forEach(el => {
+      el.dataset.active = state;
+    });
+    // Connectors managed by updateConnectors()
+    bringCheckboxesToFront();
+  };
+
+  window.isActive = id => {
+    const el = document.getElementById(id);
+    return el ? el.dataset.active === 'true' : false;
+  }
+
+  // -- updateCompatibility ---------------------------------------
+  // Called after any checkbox change. Filters compatible devices
+  // based on current selections and updates active/inactive states.
+  function updateCompatibility() {
+    if (!CONNECTIONS.length) return;
+
+    const { elbow, wrist, wristAux, hand } = getCheckedByGroup();
+    const anySelected = elbow || wrist || hand;
+
+    if (!anySelected) {
+      window.setAllActive(true);
+      return;
+    }
+
+    const compatRows = getCompatibleRows(elbow, wrist, hand, wristAux);
+    const validElbow = validDevicesForGroup(compatRows, 'elbow');
+    const validWrist = validDevicesForGroup(compatRows, 'wrist');
+    const validHand  = validDevicesForGroup(compatRows, 'hand');
+
+    document.querySelectorAll('[id^="Checkbox_"]').forEach(el => {
+      const devId = el.dataset.deviceId;
+      if (!devId) return;
+      const cbId  = el.id;
+      if (el.getAttribute('checked') === 'true') return;
+
+      const group  = groupOf(devId);
+      let active;
+      if (group === 'elbow')      active = validElbow.has(devId);
+      else if (group === 'wrist') active = validWrist.has(devId);
+      else if (group === 'hand')  active = validHand.has(devId);
+      else active = true;
+
+      window.setActive(cbId, active);
+    });
+
+  }
+
+  // Look up a device record by checkbox element or device id string.
+  function getDevice(idOrEl) {
+    const id = typeof idOrEl === 'string'
+      ? idOrEl.replace('Checkbox_', '')
+      : idOrEl.dataset?.deviceId;
+    return DEVICES[id] ?? null;
+  }
+
+  // ===============================================================
+  // Application hooks - replace placeholder bodies with real logic
+  // ===============================================================
+
+  // -- Linked device pairs ---------------------------------------
+  // Devices in each pair are always kept in sync for checked,
+  // active/inactive state. Add future pairs here as needed.
+  const LINKED_PAIRS = [
+    ['Checkbox_RotW_Lukearm', 'Checkbox_FlxW_Lukearm'],
+  ];
+
+  // Return the linked partner of a checkbox id, or null if none.
+  function getLinkedPartner(cbId) {
+    for (const pair of LINKED_PAIRS) {
+      if (pair[0] === cbId) return pair[1];
+      if (pair[1] === cbId) return pair[0];
+    }
+    return null;
+  }
+
+  // -- updateNextButton ------------------------------------------
+  // Enables the NEXT button only when exactly one checkbox is selected
+  // from each of the three groups:
+  //   Group 1: PwrE_* or HybE_*  (elbow)
+  //   Group 2: RotW_* or FlxW_*  (wrist)
+  //   Group 3: OCHand_* or MFHand_* (hand)
+  function updateNextButton() {
+    const checked = id =>
+      document.getElementById(id)?.getAttribute('checked') === 'true';
+
+    const elbowOk = [...document.querySelectorAll(
+      '[id^="Checkbox_PwrE_"], [id^="Checkbox_HybE_"], #Checkbox_No_Elbow')]
+      .filter(el => el.getAttribute('checked') === 'true').length === 1;
+
+    // Count wrist selections. Three valid "one wrist" cases:
+    //   1. Exactly one RotW_* or FlxW_* or No_Wrist checked (standard)
+    //   2. RotW_Lukearm + FlxW_Lukearm checked (linked pair - counts as one)
+    //   3. Any RotW_* + FlxW_PoweredFlexionWrist checked (aux wrist combo - counts as one)
+    const checkedWrists = [...document.querySelectorAll(
+      '[id^="Checkbox_RotW_"], [id^="Checkbox_FlxW_"], #Checkbox_No_Wrist')]
+      .filter(el => el.getAttribute('checked') === 'true');
+
+    let wristOk = false;
+    if (checkedWrists.length === 1) {
+      wristOk = true;  // simple single selection
+    } else if (checkedWrists.length === 2) {
+      const ids = checkedWrists.map(el => el.id);
+      // Linked pair (e.g. RotW_Lukearm + FlxW_Lukearm)
+      const isLinkedPair = checkedWrists.some(el => {
+        const partner = getLinkedPartner(el.id);
+        return partner && ids.includes(partner);
+      });
+      // Aux wrist combo: one RotW_* + FlxW_PoweredFlexionWrist
+      const hasPFW      = ids.includes('Checkbox_FlxW_PoweredFlexionWrist');
+      const hasRotW     = ids.some(id => id.startsWith('Checkbox_RotW_'));
+      const isAuxCombo  = hasPFW && hasRotW;
+      wristOk = isLinkedPair || isAuxCombo;
+    }
+
+    const handOk  = [...document.querySelectorAll(
+      '[id^="Checkbox_OCHand_"], [id^="Checkbox_MFHand_"]')]
+      .filter(el => el.getAttribute('checked') === 'true').length === 1;
+
+    const btn = document.getElementById('btn-next');
+    if (elbowOk && wristOk && handOk) {
+      btn.removeAttribute('disabled');
+    } else {
+      btn.setAttribute('disabled', '');
+    }
+  }
+
+  function updateGlow() {
+    const btn = document.getElementById('btn-next');
+    const complete = !btn?.hasAttribute('disabled');
+
+    // Remove glow and restore all connectors to their base lineWidth
+    document.querySelectorAll('[id^="Conn_"]').forEach(g => {
+      g.removeAttribute('filter');
+      g.querySelectorAll('path').forEach(p => {
+        const lw = g.dataset.lineWidth;
+        if (lw && p.getAttribute('stroke-width') !== '0') {
+          p.setAttribute('stroke-width', lw);
+        }
+      });
+    });
+
+    if (!complete) return;
+
+    // Use same visibility logic as updateConnectors
+    const PASSTHROUGH = new Set(['Checkbox_No_Elbow', 'Checkbox_No_Wrist']);
+    const checkedIds = new Set(
+      [...document.querySelectorAll('[id^="Checkbox_"][checked="true"]')]
+        .map(el => el.id).filter(id => !PASSTHROUGH.has(id))
+    );
+
+    document.querySelectorAll('[id^="Conn_"]').forEach(g => {
+      const chainCbs = g.dataset.allCbs?.split(',') || [];
+      const allActive = chainCbs.every(cbId =>
+        document.getElementById(cbId)?.dataset.active === 'true');
+      const compatWithChecked = [...checkedIds].every(cbId =>
+        chainCbs.includes(cbId));
+      if (!allActive || !compatWithChecked) return;
+
+      const lw = parseFloat(g.dataset.lineWidth) || 0.5;
+      g.setAttribute('filter', 'url(#connector-glow)');
+      g.querySelectorAll('path').forEach(p => {
+        p.setAttribute('stroke-width', String(lw * 3));
+      });
+    });
+  }
+
+  // Called whenever a checkbox is selected or deselected.
+  // `id`      - the full checkbox element id (e.g. "Checkbox_MFHand_TASKA")
+  // `checked` - boolean, true = just selected, false = just deselected
+  // `device`  - the full device record from DEVICES, or null
+  function onCheckboxChange(id, checked) {
+    const device = getDevice(id);
+    updateNoSelectionDevices();
+    updateCompatibility();
+    updateConnectors();
+    updateNextButton();
+    updateGlow();
+  }
+
+  // Called when the CLEAR button is pressed (after checkboxes are cleared).
+  // Called when the CLEAR button is pressed.
+  // Resets the chart to its initial state:
+  //   - all checkboxes unchecked
+  //   - all checkboxes, labels and connectors set back to active
+  // Does NOT fire onCheckboxChange for each individual checkbox.
+  function onClearAll() {
+    // Uncheck all checkboxes directly, bypassing onCheckboxChange
+    document.querySelectorAll('[id^="Checkbox_"]').forEach(el => {
+      el.setAttribute('checked', 'false');
+    });
+    // Reactivate everything - checkboxes, labels, connectors
+    window.setAllActive(true);
+    updateNoSelectionDevices();
+    updateCompatibility();
+    updateConnectors();
+    updateNextButton();
+    updateGlow();
+    updateGlow();
+  }
+
+  // Called when the NEXT button is pressed.
+  // `selection` - object with three keys, each { id, name }:
+  //   selection.elbow - the selected PwrE_* or HybE_* checkbox
+  //   selection.wrist - the selected RotW_* or FlxW_* checkbox
+  //   selection.hand  - the selected OCHand_* or MFHand_* checkbox
+  function onNext(selection) {
+    const { elbow, wrist, wristAux, hand } = selection;
+    if (!elbow || !wrist || !hand) return;
+
+    const connection = findConnection(elbow.name, wrist?.name, hand.name, wristAux?.name);
+    const cableId    = connection?.cableId  || '';
+    const gen2Level  = connection?.gen2Level || '';
+
+    // -- Build device label strings -----------------------------------------
+    const deviceStr = (d, isMF = false) => {
+      if (!d) return '';
+      let s = d.manufacturer ? `${d.label} by ${d.manufacturer}` : d.label;
+      if (d.partNumber) s += ` ${d.partNumber}`;
+      if (isMF) s += ' (Multifunction Configuration)';
+      return s;
+    };
+
+    const elbowStr = deviceStr(elbow);
+
+    // Wrist: concatenate primary + aux if present
+    const wristStr = [wrist, wristAux].filter(Boolean).map(deviceStr).join(' + ');
+
+    const isMFHand = hand?.name?.startsWith('MFHand_');
+    const handStr  = deviceStr(hand, isMFHand);
+
+    // -- [DD] parts ---------------------------------------------------------
+    const partsStr = gen2Level ? `G2SC, ${gen2Level}` : '';
+
+    // -- [EE] cable type ----------------------------------------------------
+    const cableStr = cableId || '';
+
+    // -- Assemble and navigate ----------------------------------------------
+    const url = 'https://coaptengineering.com/tool-results?' +
+      'elbow='  + encodeURIComponent(elbowStr)  +
+      '&wrist=' + encodeURIComponent(wristStr)  +
+      '&hand='  + encodeURIComponent(handStr)   +
+      '&parts=' + encodeURIComponent(partsStr)  +
+      '&cable=' + encodeURIComponent(cableStr);
+
+    window.location.href = url;
+  }
+
+  // -- showDebugPopup --------------------------------------------
+  // Temporary debug helper - displays onNext values in a modal.
+  function showDebugPopup({ elbow, wrist, wristAux, hand, cableId }) {
+    const fmt = (d, group) => d ? `
+      <tr><td>${group}</td><td>${d.label ?? '-'}</td></tr>
+      <tr><td style="color:#999;font-size:11px">manufacturer</td><td style="color:#ccc;font-size:11px">${d.manufacturer ?? '-'}</td></tr>
+      ${d.partNumber ? `<tr><td style="color:#999;font-size:11px">part #</td><td style="color:#ccc;font-size:11px">${d.partNumber}</td></tr>` : ''}
+      <tr><td style="color:#999;font-size:11px">id</td><td style="color:#ccc;font-size:11px">${d.name}</td></tr>
+      <tr><td colspan="2"><hr style="border:none;border-top:1px solid #333;margin:6px 0"/></td></tr>
+    ` : `<tr><td>${group}</td><td style="color:#666">-</td></tr>`;
+
+    const table = document.getElementById('debug-table');
+    table.innerHTML =
+      fmt(elbow,    'elbow')     +
+      fmt(wrist,    'wrist')     +
+      (wristAux ? fmt(wristAux, 'wrist aux') : '') +
+      fmt(hand,     'hand')      +
+      `<tr class="cable-row"><td>cableId</td><td>${cableId ?? '(not found)'}</td></tr>`;
+    document.getElementById('debug-popup').classList.add('visible');
+  }
+
+  // -- drawManufacturerBands -------------------------------------
+  // Draws dotted-line separators and manufacturer labels/logos
+  // dynamically from DEVICES data. Call after DEVICES is loaded.
+  // Adding a new manufacturer to DeviceRegistry.csv automatically
+  // produces the correct band with no HTML changes needed.
+  function drawManufacturerBands() {
+    const svgEl = wrapper.querySelector('svg');
+
+    // Manufacturer display config - logo URL or null for text
+    const MFR_CONFIG = {
+    'Mobius':      { label: 'Mobius Bionics',    logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Mobius.png' },
+    'Ottobock':    { label: 'Ottobock',          logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Ottobock.png' },
+    'Steeper':     { label: 'Steeper',           logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Steeper.svg' },
+    'Fillauer':    { label: 'Fillauer',          logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Fillauer.png' },
+    'Ossur':       { label: 'Ossur',             logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Ossur.svg' },
+    'Psyonic':     { label: 'Psyonic',           logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Psyonic.webp' },
+    'TASKA':       { label: 'TASKA Prosthetics', logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Taska.svg' },
+    'Vincent':     { label: 'Vincent Systems',   logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Vincent.png' },
+    'COVVI':       { label: 'COVVI',             logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Covvi.png' },
+    'Aether':      { label: 'Aether',            logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Aether.webp' },
+    'BionIT':      { label: 'BionIT Labs',       logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/BionIT.png' },
+    'Esper':       { label: 'Esper Bionics',     logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Esper.png' },
+    'Prensilia':   { label: 'Prensilia',         logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/Prensilia.png' },
+    'Alt-Bionics': { label: 'Alt-Bionics',       logo: 'https://raw.githubusercontent.com/blair-lock/TRON-Device-Repos/refs/heads/main/AltBionics.png' },
+  };
+
+    const DOTLINE_COLOR = 'var(--dotline-stroke)';
+    const DOTLINE_SW    = 'var(--dotline-sw)';
+    const BAND_H        = 30;     // height of manufacturer band
+    const LOGO_H        = 22;     // logo image height
+    const FONT_SZ       = 9;      // placeholder text font size
+    const LABEL_X       = 10;     // x position of logo/text
+    const SVG_W_INNER   = 1158;   // right extent of dotted lines
+    const GAP           = 4;      // gap between dotline and first checkbox
+
+    // Remove any previously drawn bands (for re-runs)
+    svgEl.querySelectorAll('[id^="mfr_band_"],[id^="mfr_label_"],[id^="mfr_logo_"],[id^="mfr_sep_"]')
+      .forEach(el => el.remove());
+
+    // Group devices by manufacturer and find y extents from DOM
+    const mfrBands = {};
+    Object.values(DEVICES).forEach(dev => {
+      const mfr = dev.manufacturer;
+      if (!mfr) return;
+      const cbEl = document.getElementById(dev.checkboxId);
+      if (!cbEl) return;
+      const rect = cbEl.querySelector('.cb-box');
+      if (!rect) return;
+      const y  = parseFloat(rect.getAttribute('y'));
+      const h  = parseFloat(rect.getAttribute('height'));
+      if (!mfrBands[mfr]) mfrBands[mfr] = { top: y, bot: y + h };
+      else {
+        mfrBands[mfr].top = Math.min(mfrBands[mfr].top, y);
+        mfrBands[mfr].bot = Math.max(mfrBands[mfr].bot, y + h);
+      }
+    });
+
+    // Sort manufacturers by vertical position
+    const sorted = Object.entries(mfrBands)
+      .sort((a, b) => a[1].top - b[1].top);
+
+    const ns = 'http://www.w3.org/2000/svg';
+
+    // Add glow filter to SVG defs
+    let defs = svgEl.querySelector('defs');
+    if (!defs) { defs = document.createElementNS(ns, 'defs'); svgEl.prepend(defs); }
+    if (!defs.querySelector('#connector-glow')) {
+      // Glow filter using userSpaceOnUse on a large fixed region
+      defs.innerHTML += `<filter id="connector-glow" x="-200" y="-200" width="2000" height="${SVG_H + 400}" filterUnits="userSpaceOnUse">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>`;
+    }
+
+    const r = v => Math.round(v);
+
+    let firstBandTop = null;  // y of first dotted separator line
+    sorted.forEach(([mfr, band], idx) => {
+      const cfg      = MFR_CONFIG[mfr] || { label: mfr, logo: null };
+      // Band sits in the gap above the first device checkbox:
+      // from (band.top - GAP - BAND_H) to (band.top - GAP)
+      const bandBot  = band.top - GAP;
+      const bandTop  = bandBot - BAND_H;
+      const bandCy   = bandTop + BAND_H / 2;
+
+      // Dotted separator line - always draw one at bandTop
+      const drawSep = (id, y) => {
+        const line = document.createElementNS(ns, 'line');
+        line.setAttribute('id',             id);
+        line.setAttribute('x1',            '0.2');
+        line.setAttribute('y1',            `${r(y)}`);
+        line.setAttribute('x2',            `${SVG_W_INNER}`);
+        line.setAttribute('y2',            `${r(y)}`);
+        line.setAttribute('stroke',         DOTLINE_COLOR);
+        line.setAttribute('stroke-width',   DOTLINE_SW);
+        line.setAttribute('fill',          'none');
+        line.setAttribute('vector-effect', 'non-scaling-stroke');
+        svgEl.insertBefore(line, svgEl.querySelector('[id^="Connector_"]') || svgEl.firstChild);
+      };
+      if (firstBandTop === null) firstBandTop = r(bandTop);
+      drawSep(`mfr_sep_${mfr}`, bandTop);
+      // After last manufacturer, also draw a line below its devices
+      if (idx === sorted.length - 1) {
+        const yBottom = band.bot + GAP + 30;
+        drawSep(`mfr_sep_bottom`, yBottom);
+
+        // Draw vertical column separator lines (same style as horizontal)
+        const vertXs = [195, 328, 505, 605, 796, 992, 1158];
+        // Each vertical line has its own top y and optional custom bottom y
+        const vertYTops = {
+          195: 0,    // leftmost -> top of ABOVE ELBOW row
+          1158: 0,   // rightmost -> top of ABOVE ELBOW row
+          505: 40,   // between Locking/Unlocking and Rotation -> top of BELOW ELBOW row
+          796: 80,   // between Flexion/Extension and Open/Close -> top of ELBOW row
+          328: 160,  // meets first dotted separator (No_Elbow/No_Wrist section bottom)
+          605: 160,
+          992: 160,
+        };
+        const vertYBots = {};
+        const vertYTopOverride = {
+          328: firstBandTop ?? 160,  // starts at first dotted separator, not column header
+          605: firstBandTop ?? 160,  // between Rotation and Flexion/Extension
+          992: firstBandTop ?? 160,  // between Open/Close and Multifunction
+        };
+        vertXs.forEach((vx, vi) => {
+          const yTop = vertYTopOverride[vx] ?? vertYTops[vx] ?? 160;
+          const yBot = vertYBots[vx] ?? r(yBottom);
+          const vline = document.createElementNS(ns, 'line');
+          vline.setAttribute('id',            `col_sep_${vi}`);
+          vline.setAttribute('x1',            `${vx}`);
+          vline.setAttribute('y1',            `${yTop}`);
+          vline.setAttribute('x2',            `${vx}`);
+          vline.setAttribute('y2',            `${yBot}`);
+          vline.setAttribute('stroke',         DOTLINE_COLOR);
+          vline.setAttribute('stroke-width',   DOTLINE_SW);
+          vline.setAttribute('fill',          'none');
+          vline.setAttribute('vector-effect', 'non-scaling-stroke');
+          svgEl.insertBefore(vline, svgEl.querySelector('[id^="Connector_"]') || svgEl.firstChild);
+        });
+      }
+
+      // Logo or text - vertically centred in the band using dominant-baseline/alignment
+      if (cfg.logo) {
+        const img = document.createElementNS(ns, 'image');
+        img.setAttribute('id',                  `mfr_logo_${mfr}`);
+        img.setAttribute('href',                 cfg.logo);
+        img.setAttribute('x',                    `${LABEL_X}`);
+        img.setAttribute('y',                    `${r(bandCy - LOGO_H / 2)}`);
+        img.setAttribute('width',  '80');
+        svgEl.appendChild(img);
+      } else {
+        const text = document.createElementNS(ns, 'text');
+        text.setAttribute('id',               `mfr_label_${mfr}`);
+        text.setAttribute('x',                `${LABEL_X}`);
+        text.setAttribute('y',                `${r(bandCy)}`);
+        text.setAttribute('dominant-baseline','middle');
+        text.setAttribute('font-family',      getComputedStyle(document.documentElement).getPropertyValue('--font-main').trim() || 'Montserrat, sans-serif');
+        text.setAttribute('font-size',        `${FONT_SZ}`);
+        text.setAttribute('font-weight',      '600');
+        text.setAttribute('fill',             '#555');
+        text.textContent = cfg.label;
+        svgEl.appendChild(text);
+      }
+    });
+  }
+
+  // -- bringCheckboxesToFront ------------------------------------
+  // Moves all checkbox groups, labels and PN labels to the end of
+  // the SVG so they always render above connector lines.
+  function bringCheckboxesToFront() {
+    const svgEl = wrapper.querySelector('svg');
+    // Collect in order: labels first, then checkboxes (so checkboxes are topmost)
+    const toMove = [
+      ...svgEl.querySelectorAll('[id^="fo_Label_"]'),
+      ...svgEl.querySelectorAll('[id^="Checkbox_"]'),
+    ];
+    toMove.forEach(el => svgEl.appendChild(el));
+  }
+
+  // -- patchSVGFonts ---------------------------------------------
+  // Applies --font-main to static SVG text elements that can't use CSS vars.
+  function patchSVGFonts() {
+    const font = getComputedStyle(document.documentElement)
+      .getPropertyValue('--font-main').trim() || 'Montserrat, sans-serif';
+    wrapper.querySelector('svg').querySelectorAll('text[font-family]').forEach(el => {
+      el.setAttribute('font-family', font);
+    });
+  }
+
+
+  // -- positionFooter -------------------------------------------
+  // Positions footer elements (buttons, footnotes) a fixed gap
+  // below the bottom manufacturer separator line.
+  function positionFooter() {
+    const sepBottom = document.getElementById('mfr_sep_bottom');
+    if (!sepBottom) return;
+    const footerY = parseFloat(sepBottom.getAttribute('y1')) + 20;
+
+    ['fo-clear-all', 'fo-next', 'fo-footnotes'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.setAttribute('y', Math.round(footerY * 10) / 10);
+    });
+
+    // Also expand SVG viewBox height to fit footer content
+    const svgEl = wrapper.querySelector('svg');
+    const foFootnotes = document.getElementById('fo-footnotes');
+    if (foFootnotes) {
+      const needed = footerY + parseFloat(foFootnotes.getAttribute('height')) + 20;
+      const vb = svgEl.getAttribute('viewBox').split(' ');
+      vb[3] = Math.max(parseFloat(vb[3]), needed);
+      svgEl.setAttribute('viewBox', vb.join(' '));
+    }
+  }
+
+
+
+
+  // -- drawConnectors --------------------------------------------------------
+  // Draws one H-V-H connector path per CONNECTIONS row.
+  // from = elbow (if real device) or wrist (if No_Elbow) or wristAux (if no wrist either)
+  // to   = hand always
+  // Rows with both No_Elbow and no real wrist are skipped.
+  function drawConnectors() {
+    const svgEl  = wrapper.querySelector('svg');
+    const svgRect = svgEl.getBoundingClientRect();
+    // Use vw/width for uniform scale - works regardless of viewBox height
+    const scaleX  = SVG_W / svgRect.width;
+    const scaleY  = scaleX;
+
+    const BUS_ELBOW = 466.5;   // x of elbow->wrist bus
+    const BUS_WRIST = 734.4;   // x of wrist->hand (OCHand) bus
+    const BUS_MFHAND = 949.8;  // x of wrist->hand (MFHand) bus
+    const CR  = 5;             // corner radius
+    const SW  = parseFloat(getComputedStyle(document.documentElement)
+                  .getPropertyValue('--connector-sw')) || 1.5;
+
+    // Remove existing connector elements
+    svgEl.querySelectorAll('[id^="Conn_"]').forEach(e => e.remove());
+
+    const ns = 'http://www.w3.org/2000/svg';
+    const r  = v => Math.round(v * 10) / 10;
+
+    // Get SVG y-centre of a checkbox
+    // y coord read directly from SVG attributes (already in SVG space)
+    // Avoids screen-coordinate conversion issues on mobile
+    const cbY = (cbId) => {
+      const el = document.getElementById(cbId);
+      if (!el) return null;
+      const rect = el.querySelector('.cb-box');
+      if (!rect) return null;
+      const y = parseFloat(rect.getAttribute('y'));
+      const h = parseFloat(rect.getAttribute('height'));
+      return y + h / 2;
+    };
+
+    // Get SVG x of right edge of a checkbox (from endpoint)
+    const cbXRight = (cbId) => {
+      const el = document.getElementById(cbId);
+      if (!el) return null;
+      const rect = el.querySelector('.cb-box');
+      if (!rect) return null;
+      return parseFloat(rect.getAttribute('x')) + parseFloat(rect.getAttribute('width'));
+    };
+
+    // Get SVG x of left edge of a checkbox (to endpoint)
+    const cbXLeft = (cbId) => {
+      const el = document.getElementById(cbId);
+      if (!el) return null;
+      const rect = el.querySelector('.cb-box');
+      if (!rect) return null;
+      return parseFloat(rect.getAttribute('x'));
+    };
+
+    // Build segments from CONNECTIONS rows.
+    // Each row produces one or more adjacent-device segments:
+    //   elbow -> wrist, wrist -> wristAux (if present), last_wrist -> hand
+    // Rows with No_Elbow + No_Wrist + no wristAux are skipped.
+    const segments = [];  // { idx, segIdx, cableId, fromCbId, toCbId, color, allCbs }
+
+    CONNECTIONS.forEach((row, rowIdx) => {
+      const { cableId, elbow, wrist, wristAux, hand } = row;
+      if (!hand) return;
+
+      const realElbow    = elbow && elbow !== 'No_Elbow'   ? elbow    : null;
+      const realWrist    = wrist && wrist !== 'No_Wrist'   ? wrist    : null;
+      const realWristAux = wristAux                        ? wristAux : null;
+
+      // Build the device chain (only real devices, no No_* placeholders)
+      const chain = [
+        ...(realElbow    ? [realElbow]    : []),
+        ...(realWrist    ? [realWrist]    : []),
+        ...(realWristAux ? [realWristAux] : []),
+        hand,
+      ];
+
+      if (chain.length < 2) return; // nothing to draw
+
+      // Colour from explicit Color Code column, fallback to Cable ID letter prefix
+      const colorLetter = row.colorCode || cableId.match(/^[A-Z]/)?.[0] || '';
+      const color       = '#888888';  // fallback; overridden by LINE_PARAMS at draw time
+      const allCbs  = chain.map(d => 'Checkbox_' + d);
+
+      // One segment per adjacent pair in the chain
+      for (let s = 0; s < chain.length - 1; s++) {
+        segments.push({
+          idx:      rowIdx * 10 + s,
+          cableId,
+          colorLetter,
+          fromCbId: 'Checkbox_' + chain[s],
+          toCbId:   'Checkbox_' + chain[s + 1],
+          color,
+          allCbs,   // all checkboxes in this row's chain (for visibility check)
+        });
+      }
+    });
+
+    // Draw each segment as a smooth cubic bezier
+    segments.forEach(c => {
+      const x1 = cbXRight(c.fromCbId);
+      const x2 = cbXLeft(c.toCbId);
+      const y1 = cbY(c.fromCbId);
+      const y2 = cbY(c.toCbId);
+      if (x1 === null || x2 === null || y1 === null || y2 === null) return;
+
+      const cpOffset = Math.abs(x2 - x1) * 0.5;
+      const d = `M${r(x1)},${r(y1)} C${r(x1+cpOffset)},${r(y1)} ${r(x2-cpOffset)},${r(y2)} ${r(x2)},${r(y2)}`;
+
+      const path = document.createElementNS(ns, 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('fill', 'none');
+      const lp = LINE_PARAMS[c.colorLetter] || {};
+      const segColor = lp.color || c.color;
+      const segSW    = (lp.lineWidth && !isNaN(lp.lineWidth)) ? lp.lineWidth : SW;
+      path.setAttribute('stroke', segColor);
+      path.setAttribute('stroke-width', String(segSW));
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      path.setAttribute('vector-effect', 'non-scaling-stroke');
+
+      const g = document.createElementNS(ns, 'g');
+      g.setAttribute('id', `Conn_${c.idx}`);
+      g.dataset.fromCb   = c.fromCbId;
+      g.dataset.toCb     = c.toCbId;
+      g.dataset.cableId  = c.cableId;
+      g.dataset.color    = segColor;
+      g.dataset.lineWidth = String(segSW);
+      g.dataset.allCbs  = c.allCbs.join(',');
+      g.appendChild(path);
+      svgEl.appendChild(g);
+    });
+
+            // Draw header lines on top of vertical lines and rects
+        const drawHeaderLine = (y, sw, color) => {
+          const hl = document.createElementNS(ns, 'line');
+          hl.setAttribute('x1', '195');   hl.setAttribute('y1', String(y));
+          hl.setAttribute('x2', '1158');  hl.setAttribute('y2', String(y));
+          hl.setAttribute('stroke', color);
+          hl.setAttribute('stroke-width', sw);
+          hl.setAttribute('vector-effect', 'non-scaling-stroke');
+          svgEl.appendChild(hl);
+        };
+        drawHeaderLine(120, '0.75', '#000');
+        drawHeaderLine(160, '1.5',  '#000');
+        bringCheckboxesToFront();
+    updateConnectors();
+  }
+
+  // -- updateConnectors ------------------------------------------------------
+  // Shows/hides each connector based on whether both endpoints are active.
+  // Called after any compatibility update.
+  function updateConnectors() {
+    const SW = parseFloat(getComputedStyle(document.documentElement)
+                 .getPropertyValue('--connector-sw')) || 1.5;
+
+    // Get all currently checked device IDs, excluding No_Elbow and No_Wrist
+    // (these are pass-through markers - chains never contain them directly)
+    const PASSTHROUGH = new Set(['Checkbox_No_Elbow', 'Checkbox_No_Wrist']);
+    const checkedIds = new Set(
+      [...document.querySelectorAll('[id^="Checkbox_"][checked="true"]')]
+        .map(el => el.id)
+        .filter(id => !PASSTHROUGH.has(id))
+    );
+
+    document.querySelectorAll('[id^="Conn_"]').forEach(g => {
+      const chainCbs = g.dataset.allCbs.split(',');
+
+      // All checkboxes in chain must be active
+      const allActive = chainCbs.every(cbId =>
+        document.getElementById(cbId)?.dataset.active === 'true');
+
+      // If any real device is checked, the chain must include it
+      const compatWithChecked = [...checkedIds].every(cbId =>
+        chainCbs.includes(cbId));
+
+      const visible = allActive && compatWithChecked;
+      g.querySelectorAll('path').forEach(p => {
+        p.setAttribute('stroke-width', visible ? (g.dataset.lineWidth || String(SW)) : '0');
+        if (visible) p.setAttribute('stroke', g.dataset.color);
+      });
+    });
+  }
+
+  // -- loadFootnotes ---------------------------------------------------------
+  async function loadFootnotes() {
+    try {
+      const text = await fetchCSVFromAPI(FOOTNOTES_URL);
+      const rows = parseCSV(text);
+      const fnEl = document.getElementById('fo-footnotes');
+      if (!fnEl) return;
+      const div = fnEl.querySelector('div');
+      if (!div) return;
+      div.innerHTML = rows.map(row => {
+        const num  = (row['Number'] || '').trim();
+        const text = (row['Text']   || '').trim();
+        return `<p style="margin:0 0 4px 0;"><sup style="font-weight:700;margin-right:2px;">${num}</sup>${text}</p>`;
+      }).join('');
+    } catch (err) {
+      console.warn('Footnotes fetch failed, using embedded fallback:', err);
+    }
+  }
+
+  // -- parseIncomingURL ------------------------------------------------------
+  // Reads URL query params on page load and auto-selects matching devices.
+  // Matches against the same string format used in onNext:
+  //   "{label} by {manufacturer} {partNumber}"
+  function parseIncomingURL() {
+    const params = new URLSearchParams(window.location.search);
+    const elbowParam = params.get('elbow')?.trim()  || '';
+    const wristParam = params.get('wrist')?.trim()  || '';
+    const handParam  = params.get('hand')?.trim()   || '';
+
+    if (!elbowParam && !wristParam && !handParam) return;
+
+    // Match incoming param against device label only
+    const findDeviceByParam = (param, typeFilter) => {
+      if (!param) return null;
+      const needle = param.toLowerCase();
+      return Object.values(DEVICES).find(d => {
+        if (typeFilter && !typeFilter.includes(d.type)) return false;
+        return needle.includes(d.label.toLowerCase());
+      }) || null;
+    };
+
+    const elbowDev = findDeviceByParam(elbowParam, ['PwrE', 'HybE']);
+    const wristDev = findDeviceByParam(wristParam, ['RotW', 'FlxW']);
+    const handDev  = findDeviceByParam(handParam,  ['OCHand', 'MFHand']);
+
+    // Select matching checkboxes after a short delay to ensure DOM is ready
+    setTimeout(() => {
+      [elbowDev, wristDev, handDev].forEach(dev => {
+        if (!dev) return;
+        const cb = document.getElementById(dev.checkboxId);
+        if (!cb || cb.dataset.active === 'false') return;
+        cb.setAttribute('checked', 'true');
+        onCheckboxChange(dev.checkboxId, true);
+      });
+    }, 100);
+  }
+
+  // -- loadLineParams --------------------------------------------------------
+  async function loadLineParams() {
+    try {
+      const text = await fetchCSVFromAPI(LINE_PARAMS_URL);
+      parseCSV(text).forEach(row => {
+        const code = row['Code']?.trim();
+        if (!code) return;
+        LINE_PARAMS[code] = {
+          color:     row['Hex']?.trim()          || '#888888',
+          lineWidth: parseFloat(row['LineWidth']) || 0.5,
+        };
+      });
+      console.log(`Line parameters loaded: ${Object.keys(LINE_PARAMS).length} codes`);
+    } catch (err) {
+      console.warn('Line parameters fetch failed, using defaults:', err);
+    }
+  }
+
+  // -- initChart -------------------------------------------------
+  // Master initialisation - called once fonts are guaranteed loaded.
+  // All layout-dependent work happens here.
+  async function initChart() {
+
+    // 1. Load device registry and connections from GitHub
+    await Promise.all([loadDevices(), loadConnections(), loadFootnotes(), loadLineParams()]);
+
+    // 2. Draw manufacturer bands and patch SVG fonts
+    drawManufacturerBands();
+    positionFooter();
+    patchSVGFonts();
+
+    // 3. Bind all interaction handlers (no layout dependency)
+    bindCheckboxes();
+
+    // 4. ViewBox fixed in SVG attributes; native scroll handles panning
+
+    // 5. Measure and size things that depend on rendered layout
+    sizeFooterButtons();
+    drawConnectors();
+    bringCheckboxesToFront();
+    parseIncomingURL();
+
+    // 6. Wire footer buttons to hook functions
+    document.getElementById('btn-clear-all').addEventListener('click', () => {
+      onClearAll();
+    });
+
+    document.getElementById('debug-close').addEventListener('click', () => {
+      document.getElementById('debug-popup').classList.remove('visible');
+    });
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+      const elbow = [...document.querySelectorAll(
+        '[id^="Checkbox_PwrE_"], [id^="Checkbox_HybE_"], #Checkbox_No_Elbow')]
+        .find(el => el.getAttribute('checked') === 'true');
+      const wrist = [...document.querySelectorAll(
+        '[id^="Checkbox_RotW_"], [id^="Checkbox_FlxW_"], #Checkbox_No_Wrist')]
+        .find(el => el.getAttribute('checked') === 'true');
+      const hand  = [...document.querySelectorAll(
+        '[id^="Checkbox_OCHand_"], [id^="Checkbox_MFHand_"]')]
+        .find(el => el.getAttribute('checked') === 'true');
+      const enrich = el => {
+        if (!el) return null;
+        const name   = el.id.replace('Checkbox_', '');
+        const device = getDevice(name);
+        return {
+          id:           el.id,
+          name,
+          manufacturer: device?.manufacturer ?? null,
+          label:        device?.label        ?? null,
+          partNumber:   device?.partNumber   ?? null,
+        };
+      };
+
+      // Find Wrist Aux - a secondary wrist device checked alongside the primary wrist.
+      // Primary wrist prefers RotW_ over FlxW_; wristAux gets the other.
+      const allCheckedWrists = [...document.querySelectorAll(
+        '[id^="Checkbox_RotW_"], [id^="Checkbox_FlxW_"]')]
+        .filter(el => el.getAttribute('checked') === 'true');
+      // Prefer RotW_ as primary wrist
+      const rotW = allCheckedWrists.find(el => el.id.startsWith('Checkbox_RotW_'));
+      const flxW = allCheckedWrists.find(el => el.id.startsWith('Checkbox_FlxW_'));
+      // Re-assign wrist to the RotW if available
+      const primaryWrist   = rotW || flxW || wrist;
+      const wristAuxEl     = allCheckedWrists.find(el => el !== primaryWrist) ?? null;
+
+      onNext({
+        elbow:    enrich(elbow),
+        wrist:    enrich(primaryWrist),
+        wristAux: enrich(wristAuxEl),
+        hand:     enrich(hand),
+      });
+    });
+
+    // 4. Fade out hint after 5s
+  }
+
+  // -- Resize handler: redraw dynamic SVG elements on window resize/zoom
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      // Remove existing dynamic elements before redrawing
+      document.querySelectorAll('[id^="Conn_"], [id^="mfr_sep_"], [id^="col_sep_"], [id^="mfr_band_"]').forEach(el => el.remove());
+      drawManufacturerBands();
+      drawConnectors();
+      updateConnectors();
+      updateGlow();
+    }, 150);
+  });
+
+  // -- Bootstrap -------------------------------------------------
+  // Wait for Montserrat to load before initialising, so that all
+  // text measurements (button widths, diagnostic dots) are accurate.
+  // Falls back gracefully if the FontFace API is unavailable.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(initChart);
+  } else {
+    window.addEventListener('DOMContentLoaded', () => setTimeout(initChart, 100));
+  }
+
+</script>
+
+  <!-- ── DEBUG POPUP (temporary) ── -->
+  <div id="debug-popup">
+    <button id="debug-close" title="Close">✕</button>
+    <h3>🛠 onNext debug</h3>
+    <table id="debug-table"></table>
+  </div>
+</body>
+</html>
